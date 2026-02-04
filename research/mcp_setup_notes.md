@@ -55,7 +55,6 @@
 3. ✅ Confirm GitHub account is linked - **VERIFIED via Cursor integration**
 4. ✅ Update this document with connection status - **DONE**
 
-**Detailed Guide**: See `research/mcp_verification_guide.md` for step-by-step verification instructions.
 
 ## Troubleshooting
 

@@ -19,12 +19,18 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual environments
 venv/
 env/
 ENV/
 .venv
+.uv/
+
+# Python version management
+.python-version
+pyvenv.cfg
 
 # IDE
 .vscode/
@@ -32,23 +38,73 @@ ENV/
 *.swp
 *.swo
 *~
+# Note: .cursor/rules is required and should be committed
+.cursor/*
+!.cursor/rules
 
 # Environment variables
 .env
 .env.local
+.env.*.local
 
 # OS
 .DS_Store
 Thumbs.db
+.DS_Store?
 
-# Project specific
-*.log
+# Testing & Coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# Type checking
 .mypy_cache/
 .dmypy.json
 dmypy.json
+.pytype/
+.pyre/
+
+# Linting
+.ruff_cache/
+.flake8
+
+# Project specific
+*.log
+*.log.*
 
 # MCP
 .mcp/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# CI/CD artifacts
+.github/workflows/*.yml.bak
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets and credentials
+secrets/
+*.pem
+*.key
+*.cert
+*.secret
+
+# Build artifacts
+*.whl
+*.tar.gz
