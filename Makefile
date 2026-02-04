@@ -13,7 +13,11 @@ setup:
 
 test:
 	@echo "Running tests..."
-	@docker-compose run --rm test || echo "Note: Docker tests will be configured in Task 3"
+	@if [ -f "docker-compose.yml" ]; then \
+		docker-compose run --rm test; \
+	else \
+		echo "Note: Docker tests will be configured in Task 3"; \
+	fi
 
 spec-check:
 	@echo "Checking spec alignment..."
@@ -24,6 +28,8 @@ spec-check:
 	@if [ ! -f "specs/_meta.md" ]; then \
 		echo "WARNING: specs/_meta.md not found"; \
 	fi
+	@echo "Validating Pydantic models..."
+	@uv run python -c "from specs.skills import TrendResearchInput, ContentGenerateInput, EngagementManageInput; print('✓ Pydantic models valid')" 2>/dev/null || echo "⚠️  Pydantic models not yet importable (expected in Task 2)"
 	@echo "Spec structure check passed"
 
 clean:

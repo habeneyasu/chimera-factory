@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Chimera Orchestrator API
+  version: 0.1.0
+  description: API for managing the Chimera Agent fleet
+  contact:
+    name: habeneyasu
+    url: https://github.com/habeneyasu/chimera-factory
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+paths:
+  /agents:
+    get:
+      summary: List all agents
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agent'
+    
+    post:
+      summary: Create a new agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentCreate'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+  /agents/{agent_id}:
+    get:
+      summary: Get agent details
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+  /campaigns:
+    post:
+      summary: Create a new campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignCreate'
+      responses:
+        '201':
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+
+components:
+  schemas:
+    Agent:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - wallet_address
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum: [planning, working, judging, sleeping]
+        wallet_address:
+          type: string
+          pattern: '^0x[a-fA-F0-9]{40}$'
+        persona_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    
+    AgentCreate:
+      type: object
+      required:
+        - name
+        - persona_id
+      properties:
+        name:
+          type: string
+        persona_id:
+          type: string
+    
+    Campaign:
+      type: object
+      required:
+        - id
+        - goal
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        goal:
+          type: string
+        status:
+          type: string
+          enum: [active, paused, completed]
+        agent_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    
+    CampaignCreate:
+      type: object
+      required:
+        - goal
+        - agent_ids
+      properties:
+        goal:
+          type: string
+        agent_ids:
+          type: array
+          items:
+            type: string
+            format: uuid

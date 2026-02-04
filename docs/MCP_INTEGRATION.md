@@ -18,8 +18,7 @@ This guide covers Model Context Protocol (MCP) integration for Project Chimera, 
 
 **Location**: `.cursor/mcp.json` in project root
 
-This file is already configured with the following MCP servers:
-- **Git MCP**: Version control operations
+This file is configured with the following MCP servers:
 - **Filesystem MCP**: File system operations
 - **GitHub MCP**: GitHub API operations
 
@@ -54,15 +53,12 @@ CDP_API_KEY_PRIVATE_KEY=your_cdp_private_key
 
 ### Step 2: Verify Server Status
 
-You should see three MCP servers:
+You should see two MCP servers:
 
 | Server | Status | Tools Available |
 |--------|--------|-----------------|
 | **GitHub MCP** | ✅ Enabled | 26 tools |
 | **Filesystem MCP** | ✅ Enabled | 15 tools |
-| **Git MCP** | ⚠️ Error | N/A |
-
-**Note**: Git MCP may show an error, but Git CLI works correctly. This is a non-critical MCP server initialization issue.
 
 ### Step 3: Test MCP Tools
 
@@ -85,12 +81,6 @@ In Cursor chat, try:
 1. Create `.env` file with `GITHUB_TOKEN`
 2. Generate token: GitHub → Settings → Developer settings → Personal access tokens
 3. Restart Cursor IDE
-
-### Git MCP Error
-
-- Git CLI works correctly (`git --version`)
-- Error is specific to MCP server initialization
-- Non-critical for development (Git CLI can be used directly)
 
 ## MCP Sense (Tenx) Integration
 

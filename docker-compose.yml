@@ -1,0 +1,42 @@
+# Docker Compose: Project Chimera
+# Prepared By: habeneyasu
+# Repository: https://github.com/habeneyasu/chimera-factory
+
+version: '3.8'
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - .venv:/app/.venv
+    environment:
+      - PYTHONPATH=/app
+    command: pytest tests/ -v --cov=src/chimera_factory --cov-report=term-missing
+    networks:
+      - chimera-network
+
+  # Future services (Task 3)
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: chimera_dev
+  #     POSTGRES_USER: chimera
+  #     POSTGRES_PASSWORD: chimera_dev_password
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - chimera-network
+  #
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - chimera-network
+
+networks:
+  chimera-network:
+    driver: bridge

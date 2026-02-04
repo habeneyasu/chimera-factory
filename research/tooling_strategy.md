@@ -17,27 +17,7 @@ MCP servers provide standardized interfaces for development tools, enabling the 
 
 ### Selected MCP Servers
 
-#### 1. **Git MCP Server** (Development)
-**Purpose**: Version control operations via MCP
-**Use Cases**:
-- Commit management
-- Branch operations
-- Repository status checks
-- Git history queries
-
-**Configuration**:
-```json
-{
-  "mcpServers": {
-    "git": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git"]
-    }
-  }
-}
-```
-
-#### 2. **Filesystem MCP Server** (Development)
+#### 1. **Filesystem MCP Server** (Development)
 **Purpose**: File system operations via MCP
 **Use Cases**:
 - File reading/writing
@@ -56,7 +36,7 @@ MCP servers provide standardized interfaces for development tools, enabling the 
 }
 ```
 
-#### 3. **PostgreSQL MCP Server** (Development)
+#### 2. **PostgreSQL MCP Server** (Development)
 **Purpose**: Database operations during development
 **Use Cases**:
 - Schema queries
@@ -78,7 +58,7 @@ MCP servers provide standardized interfaces for development tools, enabling the 
 }
 ```
 
-#### 4. **GitHub MCP Server** (Development)
+#### 3. **GitHub MCP Server** (Development)
 **Purpose**: GitHub API operations
 **Use Cases**:
 - Issue management
@@ -193,7 +173,6 @@ skills/
 │                │                    │
 │  ┌─────────────▼─────────────────┐ │
 │  │  MCP Servers (Dev Tools)      │ │
-│  │  - Git MCP                    │ │
 │  │  - Filesystem MCP             │ │
 │  │  - PostgreSQL MCP            │ │
 │  │  - GitHub MCP                 │ │

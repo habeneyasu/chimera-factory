@@ -3,7 +3,9 @@ name = "chimera-factory"
 version = "0.1.0"
 description = "Project Chimera: The Factory that builds Autonomous AI Influencers"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pydantic>=2.0.0",
+]
 
 [build-system]
 requires = ["hatchling"]

@@ -1,10 +1,5 @@
 {
   "mcpServers": {
-    "git": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git"],
-      "description": "Git operations for version control"
-    },
     "filesystem": {
       "command": "npx",
       "args": [

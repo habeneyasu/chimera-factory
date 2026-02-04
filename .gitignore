@@ -32,6 +32,17 @@ ENV/
 .python-version
 pyvenv.cfg
 
+# Node.js / npm (for MCP servers)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnp.*
+
 # IDE
 .vscode/
 .idea/
@@ -52,6 +63,7 @@ pyvenv.cfg
 .DS_Store
 Thumbs.db
 .DS_Store?
+._*
 
 # Testing & Coverage
 .pytest_cache/
@@ -61,6 +73,9 @@ htmlcov/
 .tox/
 .nox/
 .hypothesis/
+.pytest_cache/
+test-results/
+junit.xml
 
 # Type checking
 .mypy_cache/
@@ -68,10 +83,12 @@ htmlcov/
 dmypy.json
 .pytype/
 .pyre/
+.pytype/
 
 # Linting
 .ruff_cache/
 .flake8
+.ruff_cache/
 
 # Project specific
 *.log
@@ -83,9 +100,11 @@ dmypy.json
 # Docker
 .dockerignore
 docker-compose.override.yml
+.docker/
 
 # CI/CD artifacts
 .github/workflows/*.yml.bak
+.github/workflows/*.yaml.bak
 
 # Temporary files
 *.tmp
@@ -98,6 +117,7 @@ docker-compose.override.yml
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
 
 # Secrets and credentials
 secrets/
@@ -105,7 +125,51 @@ secrets/
 *.key
 *.cert
 *.secret
+*.token
+credentials.json
 
 # Build artifacts
 *.whl
 *.tar.gz
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Project-specific: Weaviate data
+weaviate_data/
+
+# Project-specific: Generated content
+generated/
+output/
+*.mp4
+*.avi
+*.mov
+*.mkv
