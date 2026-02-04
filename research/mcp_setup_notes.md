@@ -23,9 +23,15 @@
 ## Connection Status
 
 **Date**: February 4, 2025  
-**Status**: *[To be confirmed - check IDE for MCP Sense connection]*  
-**GitHub Account**: *[Your GitHub username]*  
-**Connection Timestamp**: *[To be filled]*
+**Status**: *[ACTION REQUIRED - Verify connection in IDE]*  
+**GitHub Account**: *[Your GitHub username - to be filled]*  
+**Connection Timestamp**: *[To be filled after verification]*
+
+**Verification Steps**:
+1. Check IDE status bar for MCP Sense indicator
+2. Verify connection in MCP Sense dashboard
+3. Confirm GitHub account is linked
+4. Update this document with connection status
 
 ## Troubleshooting
 
