@@ -1,0 +1,51 @@
+# Project Chimera: AI Agent Context Rules
+
+## Project Context
+This is **Project Chimera**, an autonomous influencer system that builds digital entities capable of researching trends, generating content, and managing engagement without human intervention.
+
+## The Prime Directive
+**NEVER generate code without checking `specs/` first.**
+
+All implementation must be traceable to specifications in the `specs/` directory. If a spec doesn't exist, create it before writing code.
+
+## Traceability
+**Explain your plan before writing code.**
+
+Before implementing any feature:
+1. Reference the relevant spec file
+2. Explain how the implementation aligns with the spec
+3. Identify any gaps or ambiguities in the spec
+4. Propose solutions that maintain spec fidelity
+
+## Architecture Principles
+
+1. **Spec-Driven Development (SDD)**: Specs are the source of truth
+2. **Skills vs. Tools**: 
+   - **Skills**: Reusable runtime functions (e.g., `skill_download_youtube`, `skill_transcribe_audio`)
+   - **MCP Servers**: External bridges (e.g., Database connectors, API gateways)
+3. **Agent Pattern**: Follow the architectural pattern defined in `research/architecture_strategy.md`
+4. **Human-in-the-Loop**: Safety layers must be defined for content approval
+
+## Code Quality Standards
+
+- Write failing tests first (TDD approach)
+- All code must pass tests in Docker container
+- Follow Python best practices and type hints
+- Document all Skills with Input/Output contracts
+- Maintain clear separation between development tools (MCP) and runtime skills
+
+## File Organization
+
+- `specs/`: All specifications (functional, technical, meta)
+- `skills/`: Agent runtime capabilities
+- `tests/`: Test-driven development tests
+- `research/`: Architecture decisions and research notes
+
+## When Asked About the Project
+
+Always reference:
+1. The relevant spec file
+2. The architecture strategy document
+3. The skill definitions and contracts
+
+Never assume or hallucinate - if information is missing, point to where it should be documented.

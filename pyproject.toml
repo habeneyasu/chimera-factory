@@ -1,0 +1,18 @@
+[project]
+name = "chimera-factory"
+version = "0.1.0"
+description = "Project Chimera: The Factory that builds Autonomous AI Influencers"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.8.0",
+    "ruff>=0.1.0",
+]
