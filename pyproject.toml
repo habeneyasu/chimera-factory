@@ -12,6 +12,8 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/chimera_factory"]
 
+# Note: dev-dependencies is deprecated but still works
+# Will migrate to dependency-groups when uv fully supports it
 [tool.uv]
 dev-dependencies = [
     "pytest>=8.0.0",
