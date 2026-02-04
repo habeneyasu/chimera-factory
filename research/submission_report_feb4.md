@@ -1,6 +1,9 @@
 # Project Chimera: Day 1 Submission Report
-**Date**: February 4, 2025  
-**Task**: Task 1 - The Strategist (Research & Foundation)
+
+**Prepared By**: habeneyasu  
+**Date**: February 4, 2026
+**Task**: Task 1 - The Strategist (Research & Foundation)  
+**Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)
 
 ---
 
@@ -253,9 +256,13 @@ See detailed schema design in `research/architecture_strategy.md` (to be updated
 ✅ **Python Environment**: Configured with `uv`  
 ✅ **Project Configuration**: `pyproject.toml` created  
 ✅ **IDE Context**: `.cursor/rules` file created with project context  
-✅ **MCP Sense Connection**: **CONNECTED** - MCP Sense interface is accessible and functional
+✅ **MCP Sense Connection**: **CONNECTED** - MCP Sense interface is accessible and functional  
+✅ **MCP Server Integration**: **VERIFIED** - 3 MCP servers detected in Cursor IDE
+  - GitHub MCP: **ENABLED** (26 tools available)
+  - Filesystem MCP: **ENABLED** (15 tools available)
+  - Git MCP: **ERROR** (non-critical, Git CLI works)
 
-**Note**: MCP Sense connection is required for traceability and governance. Connection verified through visible interface with agent selection and review workflow. Status logged in `research/mcp_setup_notes.md`.
+**Note**: MCP Sense connection is required for traceability and governance. Connection verified through visible interface with agent selection and review workflow. MCP servers configured in `.cursor/mcp.json` and detected by Cursor IDE. See `docs/MCP_INTEGRATION.md` for setup details and current status.
 
 ---
 
@@ -276,23 +283,33 @@ See detailed schema design in `research/architecture_strategy.md` (to be updated
 
 ## 5. Repository Structure
 
+**GitHub Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)
+
 ```
 chimera-factory/
-├── .cursor/
+├── .cursor/                      # IDE configuration and MCP setup
+│   ├── mcp.json                 # MCP server configuration
 │   └── rules                    # IDE context and prime directive
-├── .github/
-│   └── workflows/               # CI/CD (to be created in Task 3)
-├── research/
-│   ├── research_notes.md        # Research findings
-│   ├── architecture_strategy.md # Architectural decisions
-│   └── submission_report_feb4.md # This report
-├── specs/                       # Specifications (to be created in Task 2)
-├── skills/                      # Agent Skills (to be created in Task 2)
-├── tests/                       # Tests (to be created in Task 3)
-├── .gitignore
-├── Makefile
-├── pyproject.toml
-└── README.md
+├── docs/                         # Documentation
+│   └── MCP_INTEGRATION.md       # MCP setup and verification guide
+├── research/                     # Research and architecture
+│   ├── architecture_strategy.md  # Architectural decisions
+│   ├── mcp_setup_notes.md        # MCP Sense connection notes
+│   ├── research_notes.md         # Research findings
+│   ├── submission_report_feb4.md # This report
+│   └── tooling_strategy.md       # Tooling and skills strategy
+├── skills/                       # Agent runtime capabilities
+│   ├── README.md                 # Skills overview
+│   └── skill_*/contract.json    # Skill contracts
+├── specs/                        # Specifications (SDD source of truth)
+├── src/                          # Python package
+│   └── chimera_factory/
+│       └── __init__.py
+├── tests/                        # Test suite
+├── .gitignore                    # Git ignore patterns
+├── Makefile                      # Standardized commands
+├── pyproject.toml                # Project configuration
+└── README.md                     # Project overview
 ```
 
 ---
@@ -301,12 +318,22 @@ chimera-factory/
 
 **Tenx MCP Sense Status**: ✅ **CONNECTED** - Interface accessible with "∞ Agent" dropdown and Review workflow
 
-**Verification**: 
+**MCP Sense ↔ GitHub Connection**: ✅ **VERIFIED**
+
+**Verification Details**: 
 - MCP Sense dashboard/interface is visible and functional ✅
 - Cursor IDE is authorized on GitHub (OAuth Apps verified) ✅
 - MCP Sense integrated through Cursor IDE ✅
+- GitHub account linked: **habeneyasu** ✅
+- Repository connection: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory) ✅
 
-**GitHub Account**: habeneyasu
+**Connection Architecture**:
+- MCP Sense is connected and operational through Cursor IDE integration
+- Cursor IDE authorized on GitHub (verified in GitHub → Settings → Applications → Authorized OAuth Apps)
+- MCP Sense does not require a separate OAuth app—it operates as an integrated component of Cursor IDE
+- All development work tracked via MCP Sense telemetry
+- Telemetry data associated with GitHub account: **habeneyasu**
+- Repository: **chimera-factory** (public)
 
 **Connection Evidence**:
 - MCP Sense interface accessible
@@ -315,6 +342,7 @@ chimera-factory/
 - File management interface active ("> 10 Files")
 - Cursor authorized on GitHub (last used within last 6 months)
 - GitHub OAuth Apps verified (6 apps authorized, including Cursor)
+- GitHub repository accessible and linked
 
 ---
 
@@ -350,4 +378,5 @@ chimera-factory/
 ---
 
 **Report Prepared By**: habeneyasu  
-**Date**: February 4, 2025
+**Date**: February 4, 2025  
+**GitHub Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)

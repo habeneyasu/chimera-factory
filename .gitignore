@@ -38,9 +38,10 @@ pyvenv.cfg
 *.swp
 *.swo
 *~
-# Note: .cursor/rules is required and should be committed
+# Note: .cursor/rules and .cursor/mcp.json are required and should be committed
 .cursor/*
 !.cursor/rules
+!.cursor/mcp.json
 
 # Environment variables
 .env

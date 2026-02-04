@@ -1,48 +1,70 @@
 # Project Chimera: The Agentic Infrastructure Challenge
 
-## Mission
-Architect the "Factory" that builds the "Autonomous Influencer" - digital entities that research trends, generate content, and manage engagement without human intervention.
+**Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)
 
-## Core Philosophies
+## Overview
 
-- **Spec-Driven Development (SDD)**: Intent (Specs) is the source of truth
-- **Traceability (MCP)**: Tenx MCP Sense server connected for "Black Box" flight recorder
-- **Agentic "Skills" vs. "Tools"**: Clear separation between Skills (reusable functions) and MCP Servers (external bridges)
-- **Git Hygiene**: Commit early, commit often (Minimum 2x/day)
+Project Chimera is a factory for building autonomous AI influencers—digital entities that research trends, generate content, and manage engagement without human intervention. This repository implements the infrastructure following Spec-Driven Development (SDD) principles.
+
+## Core Principles
+
+- **Spec-Driven Development (SDD)**: Specifications are the source of truth
+- **Traceability**: Tenx MCP Sense connected for development telemetry
+- **Agentic Architecture**: FastRender Swarm pattern (Planner-Worker-Judge)
+- **Model Context Protocol (MCP)**: Universal interface for external interactions
+- **Human-in-the-Loop (HITL)**: Confidence-based escalation for safety
 
 ## Repository Structure
 
 ```
 chimera-factory/
-├── specs/              # GitHub Spec Kit structure
-├── research/           # Research notes and architecture strategy
-├── skills/             # Agent Skills (runtime capabilities)
-├── tests/              # Test-driven development tests
-├── .cursor/            # IDE context and rules
-└── .github/workflows/  # CI/CD pipelines
+├── .cursor/              # IDE configuration and MCP setup
+├── docs/                 # Documentation
+├── research/             # Research findings and architecture strategy
+├── specs/                # Specifications (SDD source of truth)
+├── skills/               # Agent runtime capabilities
+├── src/                  # Python package (SDD-compliant)
+├── tests/                # Test suite
+└── pyproject.toml        # Project configuration
 ```
 
 ## Development Status
 
 **Day 1 (February 4, 2025)**: Task 1 - The Strategist ✅ **COMPLETE**
-- [x] Environment Setup
-- [x] Research & Reading
-- [x] Architecture Strategy
-- [x] Submission Report
+- [x] Environment setup and Git repository initialization
+- [x] Research and reading (SRS, OpenClaw, MoltBook, a16z)
+- [x] Architecture strategy documentation
+- [x] MCP integration and verification
+- [x] Submission report
 
-## Getting Started
+## Quick Start
 
 ```bash
-# Setup environment
+# Setup Python environment
 make setup
 
 # Run tests
 make test
 
-# Check spec alignment
-make spec-check
+# Verify MCP integration
+# See docs/MCP_INTEGRATION.md
 ```
 
-## MCP Telemetry
+## Documentation
 
-This project requires Tenx MCP Sense to be connected to the IDE at all times for traceability and governance.
+- **Architecture**: `research/architecture_strategy.md`
+- **MCP Integration**: `docs/MCP_INTEGRATION.md`
+- **Research Findings**: `research/research_notes.md`
+- **Submission Report**: `research/submission_report_feb4.md`
+- **Tooling Strategy**: `research/tooling_strategy.md`
+
+## Requirements
+
+- Python 3.12+
+- Node.js and npx (for MCP servers)
+- Cursor IDE (or compatible MCP client)
+- Tenx MCP Sense (for traceability)
+
+## License
+
+See LICENSE file for details.
