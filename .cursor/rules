@@ -10,7 +10,7 @@ Project Chimera is a factory for building autonomous AI influencers—digital en
 
 - **Architecture**: FastRender Swarm pattern (Planner-Worker-Judge)
 - **Protocol**: Model Context Protocol (MCP) for all external interactions
-- **Database**: Hybrid architecture (PostgreSQL, MongoDB, TimescaleDB)
+- **Database**: Hybrid architecture (PostgreSQL, Weaviate, Redis, On-Chain)
 - **Safety**: Human-in-the-Loop (HITL) with confidence-based escalation
 - **Network**: Active participation in OpenClaw agent social network
 - **Language**: Python 3.12+ with type hints (Pydantic models preferred)
@@ -159,6 +159,29 @@ def research_trends(
 - **Log errors**: All errors must be logged with context
 - **Graceful degradation**: Handle failures gracefully
 
+### Dependency Strategy (The "Factory" Approach)
+
+**Prefer Dependency Injection**: Skills should not instantiate their own database connections; they should receive them from the Factory orchestrator. This ensures our Docker-based testing environment remains decoupled from production.
+
+```python
+# ✅ Good: Dependency Injection
+class TrendResearchSkill:
+    def __init__(self, db_session, weaviate_client, redis_client):
+        self.db = db_session
+        self.weaviate = weaviate_client
+        self.redis = redis_client
+    
+    def execute(self, input_data: TrendResearchInput) -> TrendResearchOutput:
+        # Use injected dependencies
+        pass
+
+# ❌ Bad: Direct instantiation
+class TrendResearchSkill:
+    def execute(self, input_data: TrendResearchInput) -> TrendResearchOutput:
+        db = create_db_connection()  # Don't do this
+        # ...
+```
+
 ```python
 class SkillError(Exception):
     """Base exception for skill errors."""
@@ -187,6 +210,12 @@ except TrendResearchError as e:
 
 When implementing agent logic, follow this pattern.
 
+**When implementing a Judge class:**
+
+- **Score > 0.9**: Auto-approve and commit.
+- **Score 0.7 - 0.9**: Trigger HumanReviewInterface.
+- **Score < 0.7**: Log as REJECT and trigger a Planner retry.
+
 ### MCP Integration
 
 - **All external interactions** must use MCP (Model Context Protocol)
@@ -195,11 +224,14 @@ When implementing agent logic, follow this pattern.
 - **Tools**: Actions (publish, discover, collaborate)
 - **Prompts**: Communication templates
 
+**Telemetry-Driven Context (MCP Sense)**: Every significant state change (Task Completion, Judge Decision, Skill Failure) must be logged via the mcp-sense-logger tool to maintain the 'Black Box' flight recorder for the project.
+
 ### Database Architecture
 
-- **PostgreSQL**: Structured data (video metadata, approvals, audit logs)
-- **MongoDB**: Semi-structured data (content drafts, trend snapshots)
-- **TimescaleDB**: Time-series data (engagement metrics, telemetry)
+- **PostgreSQL**: Structured data (video metadata, approvals, audit logs, transactional data, time-series via TimescaleDB extension)
+- **Weaviate**: Semantic memory for AI (vector database, RAG for long-term agent persona consistency)
+- **Redis**: Ephemeral cache & task queues
+- **On-Chain**: Financial ledger (Agentic Commerce)
 
 When working with data, use the appropriate database per `specs/database/schema.sql`.
 
@@ -248,8 +280,9 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 # Local application
-from chimera_factory.skills import SkillInput, SkillOutput
-from chimera_factory.models import TrendItem
+# Note: Models are currently in specs/skills/__init__.py
+# Future: Will be in src/chimera_factory/models.py and src/chimera_factory/skills.py
+from specs.skills import SkillInput, SkillOutput, TrendItem
 ```
 
 ---
@@ -268,7 +301,9 @@ from chimera_factory.models import TrendItem
 ```python
 # tests/test_trend_research.py
 import pytest
-from chimera_factory.skills.trend_research import research_trends, TrendResearchError
+# Note: Skills will be implemented in src/chimera_factory/skills/
+# For now, reference specs/skills/__init__.py for contract models
+from specs.skills import TrendResearchInput, TrendResearchOutput
 
 class TestTrendResearch:
     """Tests for trend research skill.
@@ -310,7 +345,9 @@ uv run pytest --cov=src/chimera_factory --cov-report=term-missing
 ```python
 from pydantic import BaseModel
 from typing import List
-from chimera_factory.skills import SkillInput, SkillOutput, SkillError
+# Note: Models are currently in specs/skills/__init__.py
+# Future: Will be in src/chimera_factory/skills.py
+from specs.skills import SkillInput, SkillOutput, SkillError
 
 class TrendResearchInput(SkillInput):
     """Input contract for trend research skill.
@@ -349,7 +386,7 @@ class TrendResearchRequest(BaseModel):
     topic: str
     sources: List[str]
     timeframe: str = "24h"
-    agent_id: UUID
+    agent_id: str  # Reference specs/skills/__init__.py for actual model definitions
 
 @router.post("/research")
 async def research_trends(request: TrendResearchRequest):
@@ -374,17 +411,19 @@ class Content(Base):
     """Content model.
     
     See specs/database/schema.sql for table definition.
+    Reference specs/skills/__init__.py for Pydantic model definitions.
+    Future models will be in src/chimera_factory/models.py.
     """
     __tablename__ = "content"
     
     id = Column(UUID(as_uuid=True), primary_key=True)
     plan_id = Column(UUID(as_uuid=True), ForeignKey("content_plans.id"))
     agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.id"))
-    content_type = Column(String(50), nullable=False)
+    content_type = Column(String, nullable=False)  # Reference specs/skills/__init__.py ContentGenerateInput
     content_url = Column(String, nullable=False)
     metadata = Column(JSONB)
     confidence_score = Column(Float)
-    status = Column(String(50), default="pending")
+    status = Column(String, default="pending")  # Reference specs/technical.md for status enum values
 ```
 
 ---
@@ -489,14 +528,6 @@ If you're unsure about something:
 4. **Ask for clarification**: Explain what you found and what's unclear
 
 ---
-
-## Remember
-
-**Specs are the source of truth. Code must align with specifications.**
-
-**NEVER generate code without checking specs/ first.**
-
-**Always explain your plan before writing code.**
 
 ---
 

@@ -1,0 +1,109 @@
+# CodeRabbit Configuration: Project Chimera
+# Prepared By: habeneyasu
+# Repository: https://github.com/habeneyasu/chimera-factory
+
+# CodeRabbit AI Code Review Configuration
+# This file configures automated AI-powered code reviews via CodeRabbit
+
+# Review Configuration
+reviews:
+  # Enable automatic reviews on pull requests
+  enabled: true
+  
+  # Review all pull requests, including drafts
+  draft_prs: true
+  
+  # Review frequency: "always" or "daily"
+  review_frequency: always
+  
+  # Review types to enable
+  review_types:
+    - code_quality
+    - security
+    - performance
+    - best_practices
+    - spec_alignment  # Custom: Ensure code aligns with specs/
+
+# Spec-Driven Development Enforcement
+spec_alignment:
+  # Require spec references in PR descriptions
+  require_spec_reference: true
+  
+  # Check that code matches specs/technical.md contracts
+  validate_api_contracts: true
+  
+  # Verify database schema alignment
+  validate_database_schema: true
+  
+  # Check skill contract compliance
+  validate_skill_contracts: true
+
+# Code Quality Standards
+code_quality:
+  # Minimum test coverage threshold
+  min_test_coverage: 80
+  
+  # Require type hints
+  require_type_hints: true
+  
+  # Prefer Pydantic models
+  prefer_pydantic: true
+  
+  # Check for spec references in comments
+  check_spec_references: true
+
+# Security Checks
+security:
+  # Check for hardcoded secrets
+  check_secrets: true
+  
+  # Validate MCP usage (no direct API calls)
+  validate_mcp_usage: true
+  
+  # Check dependency injection patterns
+  check_dependency_injection: true
+
+# Paths to Review
+paths:
+  include:
+    - "src/**/*.py"
+    - "tests/**/*.py"
+    - "skills/**/*.py"
+  
+  exclude:
+    - "**/__pycache__/**"
+    - "**/.venv/**"
+    - "**/node_modules/**"
+    - "**/*.pyc"
+
+# Custom Review Prompts
+custom_prompts:
+  - |
+    Before approving, verify:
+    1. Code aligns with specs/technical.md API contracts
+    2. Spec references are included in docstrings
+    3. Type hints use Pydantic models from specs/skills/__init__.py
+    4. MCP is used for all external interactions (no direct API calls)
+    5. Dependency injection is used (no direct database connections in skills)
+    6. Judge confidence scoring logic follows: >0.9 auto-approve, 0.7-0.9 HITL, <0.7 reject
+
+# Ignore Patterns
+ignore:
+  # Ignore generated files
+  - "**/generated/**"
+  - "**/output/**"
+  
+  # Ignore lock files
+  - "uv.lock"
+  - "package-lock.json"
+
+# Review Comments
+comments:
+  # Post comments inline
+  inline: true
+  
+  # Post summary comment
+  summary: true
+  
+  # Use emoji in comments
+  use_emoji: true
