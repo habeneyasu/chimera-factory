@@ -14,7 +14,7 @@ setup:
 test:
 	@echo "Running tests..."
 	@if [ -f "docker-compose.yml" ]; then \
-		docker-compose run --rm test; \
+		docker compose run --rm test; \
 	else \
 		echo "Note: Docker tests will be configured in Task 3"; \
 	fi
