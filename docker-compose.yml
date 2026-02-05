@@ -14,7 +14,7 @@ services:
       - .venv:/app/.venv
     environment:
       - PYTHONPATH=/app
-    command: pytest tests/ -v --cov=src/chimera_factory --cov-report=term-missing
+    command: uv run pytest tests/ -v --cov=src/chimera_factory --cov-report=term-missing
     networks:
       - chimera-network
 

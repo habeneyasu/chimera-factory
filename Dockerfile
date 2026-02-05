@@ -29,4 +29,4 @@ RUN uv sync --frozen
 COPY . .
 
 # Default command (can be overridden in docker-compose)
-CMD ["python", "-m", "pytest", "tests/", "-v"]
+CMD ["uv", "run", "pytest", "tests/", "-v"]
