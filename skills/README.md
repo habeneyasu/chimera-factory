@@ -276,11 +276,33 @@ skills/
     └── __init__.py
 ```
 
+## Skill Documentation
+
+Each skill has detailed documentation in its respective directory:
+
+1. **skill_trend_research/README.md**: Complete documentation for trend research skill
+   - Purpose, use cases, and examples
+   - Input/Output contract details
+   - MCP dependencies and implementation notes
+   - Error handling and testing requirements
+
+2. **skill_content_generate/README.md**: Complete documentation for content generation skill
+   - Multimodal content generation (text, image, video)
+   - Platform-specific requirements
+   - Quality assurance and safety checks
+   - Examples for each content type
+
+3. **skill_engagement_manage/README.md**: Complete documentation for engagement management skill
+   - Social media engagement actions
+   - Persona constraints and HITL integration
+   - Platform-specific handling
+   - Examples for different engagement types
+
 ## Next Steps
 
-- [ ] Create detailed README for each skill (Task 2.3)
-- [ ] Define JSON Schema contracts for each skill
-- [ ] Implement skill interfaces (Task 2.3)
+- [x] Create detailed README for each skill (Task 2.3) ✅
+- [x] Define JSON Schema contracts for each skill ✅
+- [ ] Implement skill interfaces (Task 2.3 - Python implementation)
 - [ ] Create unit tests for skills (Task 3.1)
 
 ## References
