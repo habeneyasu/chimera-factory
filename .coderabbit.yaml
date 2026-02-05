@@ -4,6 +4,11 @@
 
 # CodeRabbit AI Code Review Configuration
 # This file configures automated AI-powered code reviews via CodeRabbit
+#
+# Integration:
+# - Works alongside GitHub Actions CI/CD (see .github/workflows/main.yml)
+# - Reviews PRs automatically before CI completes
+# - Enforces Spec-Driven Development (SDD) principles
 
 # Review Configuration
 reviews:
