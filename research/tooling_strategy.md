@@ -21,15 +21,313 @@ This separation is critical for maintaining clear boundaries between development
 
 MCP servers provide standardized interfaces for development tools, enabling the IDE and development workflow to interact with external systems. These are used exclusively during development, testing, and CI/CD operations.
 
+**Key Principle**: Developer tools (MCP) are separate from runtime agent capabilities (Skills). This separation ensures that development tooling can evolve independently from agent runtime capabilities.
+
 ### Selected MCP Servers
 
-The following MCP servers are configured for development:
+The following MCP servers are selected and configured for Project Chimera development:
 
-- **Filesystem MCP**: File system operations (reading, writing, directory navigation)
-- **GitHub MCP**: GitHub API operations (issues, PRs, repository metadata)
-- **PostgreSQL MCP**: Database operations during development (schema queries, migrations)
+#### 1. Filesystem MCP (`@modelcontextprotocol/server-filesystem`)
 
-**Configuration Details**: See `docs/MCP_INTEGRATION.md` for complete setup instructions, configuration examples, and troubleshooting.
+**Purpose**: File system operations for reading, writing, and navigating project files.
+
+**Capabilities**:
+- Read files and directories
+- Write/create files
+- List directory contents
+- Search files by pattern
+- Get file metadata (size, permissions, timestamps)
+- Move/rename files
+- Delete files
+
+**Use Cases**:
+- Reading specification files before implementing code
+- Creating new files following project structure
+- Navigating codebase to understand architecture
+- Searching for specific patterns or code references
+- Managing test files and fixtures
+
+**Configuration**:
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/haben/Project/KAIM-Training-Portfolio/chimera-factory"
+      ]
+    }
+  }
+}
+```
+
+**Available Tools**: 15+ tools including:
+- `read_file`: Read file contents
+- `write_file`: Write/create files
+- `list_directory`: List directory contents
+- `search_files`: Search files by pattern
+- `get_file_info`: Get file metadata
+- `move_file`: Move/rename files
+- `create_directory`: Create directories
+
+**Example Usage**:
+```
+@filesystem read specs/technical.md
+@filesystem list_directory specs/
+@filesystem search_files pattern="*.py" path=src/
+```
+
+---
+
+#### 2. GitHub MCP (`@modelcontextprotocol/server-github`)
+
+**Purpose**: GitHub API operations for repository management, issues, pull requests, and collaboration.
+
+**Capabilities**:
+- Repository operations (read, create, update)
+- Issue management (create, list, update, close)
+- Pull request operations (create, review, merge)
+- Branch management
+- Commit history and diffs
+- File operations via GitHub API
+- Search repositories and code
+
+**Use Cases**:
+- Creating issues for bugs or features
+- Managing pull requests and code reviews
+- Reading repository documentation
+- Checking commit history and changes
+- Searching code across repositories
+- Managing project boards and milestones
+
+**Configuration**:
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+**Environment Variables Required**:
+- `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate scopes:
+  - `repo` (full repository access)
+  - `read:org` (read organization membership)
+  - `read:user` (read user profile)
+
+**Available Tools**: 26+ tools including:
+- `get_repository`: Get repository information
+- `list_issues`: List repository issues
+- `create_issue`: Create new issue
+- `get_pull_request`: Get PR details
+- `create_pull_request`: Create new PR
+- `list_commits`: List repository commits
+- `search_code`: Search code across repositories
+- `get_file_contents`: Get file contents from repository
+
+**Example Usage**:
+```
+@github get repository habeneyasu/chimera-factory
+@github list issues habeneyasu/chimera-factory state=open
+@github create issue habeneyasu/chimera-factory title="Feature: Add new skill" body="Description"
+@github search code query="trend research" repo=habeneyasu/chimera-factory
+```
+
+---
+
+#### 3. PostgreSQL MCP (`@modelcontextprotocol/server-postgres`)
+
+**Purpose**: Database operations during development for schema queries, migrations, and data inspection.
+
+**Capabilities**:
+- Execute SQL queries
+- List tables and schemas
+- Describe table structures
+- Run migrations
+- Inspect database metadata
+- Query data for testing and debugging
+
+**Use Cases**:
+- Verifying database schema matches `specs/database/schema.sql`
+- Running test queries during development
+- Inspecting data for debugging
+- Validating migrations
+- Checking table relationships and constraints
+
+**Configuration**:
+```json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      }
+    }
+  }
+}
+```
+
+**Environment Variables Required**:
+- `POSTGRES_CONNECTION_STRING`: PostgreSQL connection string
+  - Format: `postgresql://user:password@host:port/database`
+  - Example: `postgresql://chimera:password@localhost:5432/chimera_dev`
+
+**Available Tools**: 10+ tools including:
+- `query`: Execute SQL query
+- `list_tables`: List all tables
+- `describe_table`: Get table schema
+- `list_schemas`: List database schemas
+- `get_table_info`: Get detailed table information
+
+**Example Usage**:
+```
+@postgres query "SELECT * FROM agents LIMIT 10"
+@postgres list_tables
+@postgres describe_table table_name=content
+@postgres query "SELECT COUNT(*) FROM content WHERE status = 'pending'"
+```
+
+**Security Note**: PostgreSQL MCP should only be used in development. Production database access should use application-level connection pooling and proper authentication.
+
+---
+
+### Complete MCP Configuration
+
+**Location**: `.cursor/mcp.json` (project root)
+
+**Full Configuration Example**:
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/haben/Project/KAIM-Training-Portfolio/chimera-factory"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      }
+    }
+  }
+}
+```
+
+**Environment Variables** (`.env` file, not committed):
+```bash
+# GitHub MCP
+GITHUB_TOKEN=ghp_your_personal_access_token_here
+
+# PostgreSQL MCP
+POSTGRES_CONNECTION_STRING=postgresql://chimera:password@localhost:5432/chimera_dev
+```
+
+---
+
+### Setup Instructions
+
+#### Step 1: Install Prerequisites
+
+```bash
+# Verify Node.js and npx are installed
+node --version  # Should be v18+
+npx --version
+```
+
+#### Step 2: Create MCP Configuration
+
+1. Create `.cursor/mcp.json` in project root
+2. Copy the configuration example above
+3. Adjust file paths and environment variable names as needed
+
+#### Step 3: Configure Environment Variables
+
+1. Create `.env` file in project root (add to `.gitignore`)
+2. Add required environment variables:
+   - `GITHUB_TOKEN`: Generate from GitHub → Settings → Developer settings → Personal access tokens
+   - `POSTGRES_CONNECTION_STRING`: Your local PostgreSQL connection string
+
+#### Step 4: Verify Installation
+
+1. Restart Cursor IDE
+2. Check Settings → Tools & MCP
+3. Verify all three servers show as "Enabled"
+4. Test each server:
+   - `@filesystem list_directory .`
+   - `@github get repository habeneyasu/chimera-factory`
+   - `@postgres list_tables`
+
+---
+
+### Development Workflow Integration
+
+#### Before Writing Code
+
+1. **Read Specs**: Use Filesystem MCP to read specification files
+   ```
+   @filesystem read specs/_meta.md
+   @filesystem read specs/functional.md
+   @filesystem read specs/technical.md
+   ```
+
+2. **Check Database Schema**: Use PostgreSQL MCP to verify schema
+   ```
+   @postgres describe_table table_name=content
+   @postgres query "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'content'"
+   ```
+
+3. **Review Related Code**: Use Filesystem MCP to find related implementations
+   ```
+   @filesystem search_files pattern="*.py" path=src/
+   ```
+
+#### During Development
+
+1. **Create Files**: Use Filesystem MCP to create new files following project structure
+2. **Check GitHub**: Use GitHub MCP to reference issues, PRs, or documentation
+3. **Test Database**: Use PostgreSQL MCP to test queries and verify data
+
+#### After Development
+
+1. **Create Issues/PRs**: Use GitHub MCP to create issues or pull requests
+2. **Verify Schema**: Use PostgreSQL MCP to ensure database changes are correct
+3. **Document Changes**: Use Filesystem MCP to update documentation
+
+---
 
 ### Key Characteristics
 
@@ -37,6 +335,8 @@ The following MCP servers are configured for development:
 - **Who**: Developers and CI/CD pipelines
 - **Purpose**: Tooling, debugging, data access
 - **Examples**: Git operations, file system access, database queries
+- **Configuration**: `.cursor/mcp.json` (project-specific)
+- **Lifecycle**: Development-time only, not included in runtime deployments
 
 ## Agent Skills (Runtime)
 
