@@ -54,8 +54,8 @@ make test
 
 - **Architecture**: `research/architecture_strategy.md`
 - **MCP Integration**: `docs/MCP_INTEGRATION.md`
-- **Research Findings**: `research/research_notes.md`
-- **Submission Report**: `research/submission_report_feb4.md`
+- **Research Notes**: `research/research_notes.md` (working research document with detailed findings)
+- **Submission Report**: `research/submission_report_feb4.md` (official Day 1 deliverable - authoritative source)
 - **Tooling Strategy**: `research/tooling_strategy.md`
 
 ## Requirements
