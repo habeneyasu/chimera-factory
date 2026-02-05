@@ -16,17 +16,17 @@ RUN pip install --no-cache-dir uv
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files
+# Copy dependency files first (for better caching)
 COPY pyproject.toml uv.lock* ./
 
-# Install dependencies
+# Copy source directory structure (needed for package installation)
+COPY src/ ./src/
+
+# Install dependencies and package
 RUN uv sync --frozen
 
-# Copy application code
+# Copy remaining application code
 COPY . .
-
-# Install the package in editable mode
-RUN uv pip install -e .
 
 # Default command (can be overridden in docker-compose)
 CMD ["python", "-m", "pytest", "tests/", "-v"]
