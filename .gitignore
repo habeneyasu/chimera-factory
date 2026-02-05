@@ -29,7 +29,6 @@ ENV/
 .uv/
 
 # Python version management
-.python-version
 pyvenv.cfg
 
 # Node.js / npm (for MCP servers)
@@ -48,7 +47,6 @@ yarn.lock
 .idea/
 *.swp
 *.swo
-*~
 # Note: .cursor/rules and .cursor/mcp.json are required and should be committed
 .cursor/*
 !.cursor/rules
@@ -73,7 +71,6 @@ htmlcov/
 .tox/
 .nox/
 .hypothesis/
-.pytest_cache/
 test-results/
 junit.xml
 
@@ -83,12 +80,10 @@ junit.xml
 dmypy.json
 .pytype/
 .pyre/
-.pytype/
 
 # Linting
 .ruff_cache/
 .flake8
-.ruff_cache/
 
 # Project specific
 *.log
@@ -98,7 +93,6 @@ dmypy.json
 .mcp/
 
 # Docker
-.dockerignore
 docker-compose.override.yml
 .docker/
 
@@ -110,8 +104,6 @@ docker-compose.override.yml
 *.tmp
 *.temp
 *.bak
-*.swp
-*~
 
 # Database
 *.db
@@ -154,14 +146,6 @@ celerybeat.pid
 
 # mkdocs documentation
 /site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
 
 # Project-specific: Weaviate data
 weaviate_data/

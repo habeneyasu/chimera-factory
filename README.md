@@ -1,11 +1,17 @@
+> **AI Agents**: Read `.cursor/rules` first. This repository follows Spec-Driven Development - implementation code must align with `specs/` directory.
+
 # 🏭 Project Chimera: The Autonomous Influencer Factory
 
 **Build digital influencers that research trends, generate content, and manage engagement—autonomously.**
 
-[![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![Spec-Driven](https://img.shields.io/badge/Spec--Driven-Development-orange)](specs/_meta.md)
-[![MCP Enabled](https://img.shields.io/badge/MCP-3%20servers-green)](.cursor/mcp.json)
+[![TDD Ready](https://img.shields.io/badge/TDD-Failing%20Tests-red)](tests/)
+[![MCP x3](https://img.shields.io/badge/MCP-3%20servers-green)](.cursor/mcp.json)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](Dockerfile)
+[![CI/CD](https://github.com/habeneyasu/chimera-factory/actions/workflows/main.yml/badge.svg)](https://github.com/habeneyasu/chimera-factory/actions)
+[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-Review-blue)](.coderabbit.yaml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -34,25 +40,27 @@ Project Chimera is a **factory** for autonomous AI influencers:
 
 ### Agent Pattern: FastRender Swarm
 
-```
-┌─────────────┐
-│   Planner   │ ← Decomposes goals, maintains state
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│   Worker    │ ← Stateless executors (parallel, scalable)
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│    Judge    │ ← Quality assurance, validates outputs
-└─────────────┘
+```mermaid
+graph TD
+    H[Human Orchestrator] --> P[Planner Agent]
+    P --> W1[Worker 1: Research]
+    P --> W2[Worker 2: Generate]
+    P --> W3[Worker 3: Engage]
+    W1 --> J[Judge Agent]
+    W2 --> J
+    W3 --> J
+    J -->|Confidence > 0.9| A[Auto-Approve]
+    J -->|Confidence 0.7-0.9| Q[HITL Queue]
+    J -->|Confidence < 0.7| R[Reject/Retry]
+    Q --> HR[Human Review]
+    HR --> A
 ```
 
-**Key Components**:
-- **Spec-Driven Development (SDD)**: All code aligns with `specs/` directory
-- **Model Context Protocol (MCP)**: Universal interface for external interactions
-- **Skills Architecture**: Modular capabilities (trend research, content generation, engagement)
-- **Hybrid Database**: PostgreSQL (structured), MongoDB (semi-structured), TimescaleDB (time-series)
+**Hybrid Database Strategy**:
+- **Weaviate**: Semantic memory for AI (vector database, RAG)
+- **PostgreSQL**: Transactional data (campaigns, approvals, audit logs)
+- **Redis**: Ephemeral cache & task queues
+- **On-Chain**: Financial ledger (Agentic Commerce)
 
 ---
 
@@ -73,7 +81,8 @@ make test
 make spec-check
 
 # Verify MCP integration
-# See docs/MCP_INTEGRATION.md
+make verify-mcp
+# Or see docs/MCP_INTEGRATION.md for detailed setup
 ```
 
 **Prerequisites**:
@@ -100,7 +109,7 @@ chimera-factory/
 │   └── submission_report_feb4.md
 ├── specs/                # Specifications (SDD source of truth)
 │   ├── _meta.md         # Master specification
-│   ├── functional.md    # User stories (21 stories)
+│   ├── functional.md    # Comprehensive user stories for agentic workflows
 │   ├── technical.md     # API contracts and data models
 │   ├── openclaw_integration.md
 │   ├── api/             # OpenAPI specifications
@@ -108,8 +117,13 @@ chimera-factory/
 │   └── skills/          # Skill contract definitions
 ├── skills/               # Agent runtime capabilities
 │   ├── skill_trend_research/
+│   │   ├── README.md     # Contract: Input/Output
+│   │   ├── contract.json # JSON Schema validation
+│   │   └── __init__.py   # Pydantic models (from specs/skills/)
 │   ├── skill_content_generate/
+│   │   └── ... (same structure)
 │   └── skill_engagement_manage/
+│       └── ... (same structure)
 ├── src/                  # Python package (SDD-compliant)
 │   └── chimera_factory/
 ├── tests/                # Test suite (TDD approach)
@@ -140,6 +154,26 @@ chimera-factory/
 - All actions logged for audit trail
 
 **See `.cursor/rules` for complete AI co-pilot guidelines.**
+
+---
+
+## 🧪 TDD Approach: Failing Tests Define Success
+
+We practice **True Test-Driven Development**:
+
+```python
+# Example from tests/test_trend_research.py
+def test_trend_research_returns_correct_structure():
+    # This test FAILS intentionally - it defines the contract
+    result = research_trends(topic="AI influencers", sources=["twitter", "news"])
+    assert isinstance(result, dict)
+    assert "trends" in result
+    assert "confidence" in result
+    assert isinstance(result["trends"], list)
+    # Implementation doesn't exist yet - that's the point!
+```
+
+**Why Failing Tests?**: They create "empty slots" that AI agents must fill with correct implementations. Tests define the contract before code exists.
 
 ---
 
@@ -177,12 +211,23 @@ graph LR
 | **Agent Skills** | Modular capabilities (3 critical skills) | 📋 Contract Defined |
 | **OpenClaw Network** | Agent social protocols | 📋 Spec Complete |
 | **Human-in-the-Loop** | Confidence-based approval workflow | 📋 Spec Complete |
-| **Hybrid Database** | PostgreSQL + MongoDB + TimescaleDB | 📋 Schema Defined |
+| **Hybrid Database** | PostgreSQL + Weaviate (Vector) + Redis + On-Chain | 📋 Schema Defined |
 | **Docker Testing** | Containerized test environment | ✅ Implemented |
 
 ---
 
-## 🌟 Why This Isn't Another AI Project
+## 🌟 The Chimera Difference
+
+| Traditional AI Projects | Project Chimera |
+|------------------------|-----------------|
+| Build the product | Build the **factory** |
+| Prompts as "code" | Specs as source of truth |
+| Manual testing | **Failing tests define success** |
+| "It works on my machine" | Dockerized from day 1 |
+| AI as assistant | **AI as primary builder** |
+| Human writes code | Human writes specs, AI implements |
+
+### Why This Isn't Another AI Project
 
 1. **We're building the factory, not the product**
    - Infrastructure enables autonomous agent development
@@ -218,7 +263,7 @@ graph LR
 **Task 2 - The Architect** ✅ **COMPLETE**
 - [x] **Task 2.1**: Master Specification
   - [x] `specs/_meta.md` - High-level vision and constraints
-  - [x] `specs/functional.md` - 21 user stories from agent perspective
+  - [x] `specs/functional.md` - Comprehensive user stories from agent perspective
   - [x] `specs/technical.md` - API contracts and data models
   - [x] `specs/database/schema.sql` - Database schema with video metadata
   - [x] `specs/database/erd.md` - Entity Relationship Diagram
@@ -228,9 +273,25 @@ graph LR
 - [x] **Task 2.3**: Tooling & Skills Strategy
   - [x] `research/tooling_strategy.md` - Developer tools (MCP) documentation
   - [x] `skills/README.md` - Agent skills overview
-  - [x] `skills/skill_trend_research/README.md` - Trend research skill
-  - [x] `skills/skill_content_generate/README.md` - Content generation skill
-  - [x] `skills/skill_engagement_manage/README.md` - Engagement management skill
+  - [x] `skills/skill_trend_research/README.md` - Trend research skill (Input/Output contracts defined)
+  - [x] `skills/skill_content_generate/README.md` - Content generation skill (Input/Output contracts defined)
+  - [x] `skills/skill_engagement_manage/README.md` - Engagement management skill (Input/Output contracts defined)
+
+**Task 3 - The Governor** 🟡 **IN PROGRESS**
+- [x] **Task 3.1**: Test-Driven Development
+  - [x] `tests/test_init.py` - Basic package tests
+  - [ ] `tests/test_trend_research.py` - Trend data structure tests
+  - [ ] `tests/test_skills_interface.py` - Skills contract tests
+  - [ ] `tests/test_openclaw_integration.py` - Network protocol tests
+- [x] **Task 3.2**: Containerization & Automation
+  - [x] `Dockerfile` - Environment containerization ✅
+  - [x] `Makefile` - Standardized commands ✅
+  - [x] `docker-compose.yml` - Multi-service setup ✅
+  - [ ] `make spec-check` script - Spec validation
+- [ ] **Task 3.3**: CI/CD & AI Governance
+  - [ ] `.github/workflows/main.yml` - GitHub Actions
+  - [ ] `.coderabbit.yaml` - AI review policy
+  - [ ] CodeRabbit/ReviewDog integration
 
 ---
 
@@ -238,7 +299,7 @@ graph LR
 
 ### Core Documentation
 - **Master Specification**: `specs/_meta.md` - Project vision and constraints
-- **Functional Specs**: `specs/functional.md` - 21 user stories from agent perspective
+- **Functional Specs**: `specs/functional.md` - Comprehensive user stories for agentic workflows
 - **Technical Specs**: `specs/technical.md` - API contracts and data models
 - **Database Schema**: `specs/database/schema.sql` - Complete schema with video metadata
 - **OpenClaw Integration**: `specs/openclaw_integration.md` - Network participation plan
@@ -260,23 +321,17 @@ graph LR
 
 This project follows **Spec-Driven Development (SDD)**:
 
-### For Developers:
 1. **NEVER** write code without checking `specs/` first
 2. **ALWAYS** write failing tests before implementation (TDD)
 3. **COMMIT** early and often with descriptive messages
 4. **REFERENCE** spec sections in code comments
-
-### For AI Agents:
-- Follow `.cursor/rules` strictly
-- Reference spec sections in commits
-- Use `make spec-check` to validate alignment
-- Explain your plan before writing code
 
 ### Development Commands:
 ```bash
 make setup      # Install dependencies
 make test       # Run tests in Docker
 make spec-check # Validate spec alignment
+make verify-mcp # Verify MCP server connections
 make clean      # Clean build artifacts
 ```
 
@@ -292,10 +347,26 @@ make clean      # Clean build artifacts
 
 ---
 
-## 📄 License
+## 🎥 Final Deliverables (Due Friday)
 
-See LICENSE file for details.
+1. **Complete Repository** with:
+   - ✅ `specs/` directory (comprehensive user stories, API contracts, database schema)
+   - ✅ `tests/` directory (failing tests defining implementation targets)
+   - ✅ `skills/` directory (3+ skill contracts with Pydantic models)
+   - ✅ `Dockerfile` & `Makefile` (containerized environment)
+   - [ ] `.github/workflows/` (CI/CD pipeline)
+   - ✅ `.cursor/rules` (AI co-pilot prime directive)
+
+2. **5-Minute Loom Video** demonstrating:
+   - Spec structure and SDD principles
+   - Failing tests running (TDD approach)
+   - IDE agent understanding project context
+   - MCP Sense telemetry verification
+
+3. **MCP Telemetry Active** throughout development
 
 ---
 
-**Built with ❤️ following Spec-Driven Development principles. Every line of code traces back to a specification.**
+## 📄 License
+
+See LICENSE file for details.
