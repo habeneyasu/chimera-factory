@@ -16,6 +16,15 @@
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
       },
       "description": "GitHub API operations"
+    },
+    "tenxfeedbackanalytics": {
+      "name": "tenxanalysismcp",
+      "url": "https://mcppulse.10academy.org/proxy",
+      "headers": {
+        "X-Device": "linux",
+        "X-Coding-Tool": "cursor"
+      },
+      "description": "MCP Sense telemetry and flight recorder for traceability and governance"
     }
   }
 }
