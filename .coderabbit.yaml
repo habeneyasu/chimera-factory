@@ -1,0 +1,195 @@
+# CodeRabbit Configuration: Project Chimera
+# Prepared By: habeneyasu
+# Repository: https://github.com/habeneyasu/chimera-factory
+#
+# CodeRabbit AI Code Review Configuration
+# This file configures automated AI-powered code reviews via CodeRabbit
+#
+# Setup Instructions:
+# 1. Install CodeRabbit GitHub App: https://github.com/apps/coderabbitai
+# 2. Enable for this repository
+# 3. CodeRabbit will automatically review PRs based on this configuration
+#
+# Integration:
+# - Works alongside GitHub Actions CI/CD (see .github/workflows/main.yml)
+# - Reviews PRs automatically before CI completes
+# - Enforces Spec-Driven Development (SDD) principles
+
+# CodeRabbit Configuration
+language: python
+
+# Review Settings
+reviews:
+  # Enable automatic reviews on pull requests
+  enabled: true
+  
+  # Review all pull requests, including drafts
+  draft_prs: true
+  
+  # Review frequency: "always" or "daily"
+  review_frequency: always
+  
+  # Review types to enable
+  review_types:
+    - code_quality
+    - security
+    - performance
+    - best_practices
+
+# Paths Configuration
+paths:
+  include:
+    - "src/**/*.py"
+    - "tests/**/*.py"
+    - "skills/**/*.py"
+    - "*.py"
+  
+  exclude:
+    - "**/__pycache__/**"
+    - "**/.venv/**"
+    - "**/node_modules/**"
+    - "**/*.pyc"
+    - "**/generated/**"
+    - "**/output/**"
+    - "uv.lock"
+    - "package-lock.json"
+
+# Custom Instructions for AI Review
+# These instructions guide CodeRabbit to enforce Project Chimera's SDD principles
+custom_instructions: |
+  # Project Chimera: Spec-Driven Development (SDD) Review Guidelines
+  
+  ## Prime Directive
+  ⚠️ **NEVER approve code without checking specs/ first.**
+  
+  Before reviewing any code:
+  1. Verify that the PR description references relevant spec files (specs/functional.md, specs/technical.md)
+  2. Check that code aligns with specifications in specs/ directory
+  3. Verify that API contracts match specs/technical.md
+  4. Ensure database schema changes align with specs/database/schema.sql
+  5. Check that skill implementations match contracts in skills/skill_*/contract.json
+  
+  ## Spec Alignment Checks
+  
+  ### API Routes
+  - Verify FastAPI routes match OpenAPI spec in specs/technical.md
+  - Check that request/response models match JSON Schema
+  - Ensure error handling follows spec requirements
+  
+  ### Skills
+  - Verify skill implementations match contracts in skills/skill_*/contract.json
+  - Check that input/output models use Pydantic BaseModel
+  - Ensure error handling follows SkillError hierarchy
+  
+  ### Database
+  - Verify database models match specs/database/schema.sql
+  - Check that migrations are reversible
+  - Ensure foreign key relationships match ERD in specs/database/erd.md
+  
+  ## Security Checks
+  
+  ### Secrets Management
+  - Flag any hardcoded secrets (passwords, API keys, tokens)
+  - Verify environment variables are used instead
+  - Check that .env.example is updated if new env vars are added
+  
+  ### MCP Usage
+  - Verify all external interactions use MCP (Model Context Protocol)
+  - Flag direct API calls (should use MCP servers instead)
+  - Check that MCP resources/tools are properly configured
+  
+  ### Dependency Injection
+  - Verify skills use dependency injection (no direct DB connections)
+  - Check that database clients are injected, not instantiated
+  - Ensure Redis/Weaviate clients follow injection pattern
+  
+  ## Code Quality Standards
+  
+  ### Type Safety
+  - Require type hints on all functions
+  - Prefer Pydantic models over dict/Any types
+  - Flag missing return type annotations
+  
+  ### Documentation
+  - Verify docstrings reference spec sections
+  - Check that complex logic has inline comments
+  - Ensure API endpoints have OpenAPI documentation
+  
+  ### Error Handling
+  - Verify custom exceptions are used (SkillError, APIError, etc.)
+  - Check that errors are logged with context
+  - Ensure graceful degradation for external API failures
+  
+  ## Architecture Patterns
+  
+  ### FastRender Swarm
+  - Verify Planner-Worker-Judge pattern is followed
+  - Check that Judge confidence scoring follows: >0.9 auto-approve, 0.7-0.9 HITL, <0.7 reject
+  - Ensure worker agents are stateless
+  
+  ### Database Architecture
+  - Verify Weaviate is used for semantic memory (not PostgreSQL)
+  - Check that PostgreSQL is used for transactional data
+  - Ensure Redis is used for caching/queues (not persistent storage)
+  
+  ## Review Checklist
+  
+  Before approving, verify:
+  1. ✅ PR description includes spec references (Ref: specs/...)
+  2. ✅ Code aligns with specs/technical.md API contracts
+  3. ✅ Spec references are included in docstrings/comments
+  4. ✅ Type hints use Pydantic models from specs/skills/__init__.py
+  5. ✅ MCP is used for all external interactions (no direct API calls)
+  6. ✅ Dependency injection is used (no direct database connections in skills)
+  7. ✅ Judge confidence scoring logic follows spec (>0.9 auto-approve, 0.7-0.9 HITL, <0.7 reject)
+  8. ✅ No hardcoded secrets (use environment variables)
+  9. ✅ Error handling uses custom exceptions (SkillError, APIError, etc.)
+  10. ✅ Tests reference specs in docstrings
+
+# Review Comments Configuration
+comments:
+  # Post comments inline on code
+  inline: true
+  
+  # Post summary comment on PR
+  summary: true
+  
+  # Use emoji in comments for better readability
+  use_emoji: true
+  
+  # Minimum confidence level for comments (0.0 to 1.0)
+  min_confidence: 0.7
+
+# Ignore Patterns
+ignore:
+  # Generated files
+  - "**/generated/**"
+  - "**/output/**"
+  - "**/__pycache__/**"
+  
+  # Lock files
+  - "uv.lock"
+  - "package-lock.json"
+  
+  # Documentation (review separately)
+  - "**/*.md"
+  - "**/*.rst"
+  
+  # Configuration files (review manually)
+  - "docker-compose*.yml"
+  - "Dockerfile"
+  - ".github/**"
+
+# Language-Specific Settings
+python:
+  # Check for type hints
+  require_type_hints: true
+  
+  # Prefer Pydantic models
+  prefer_pydantic: true
+  
+  # Check docstrings
+  check_docstrings: true
+  
+  # Minimum test coverage (if coverage reports available)
+  min_test_coverage: 80

@@ -1,0 +1,123 @@
+# .dockerignore: Project Chimera
+# Exclude files from Docker build context for faster builds
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+ENV/
+env/
+.uv/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+test-results/
+junit.xml
+*.cover
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# Linting
+.ruff_cache/
+.flake8
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+# Note: .env.example should be included
+
+# Documentation (not needed in runtime)
+docs/
+*.md
+!README.md
+!CONTRIBUTING.md
+
+# CI/CD
+.github/
+
+# Logs
+*.log
+logs/
+!logs/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.cert
+*.secret
+*.token
+credentials.json
+
+# Build artifacts
+*.whl
+*.tar.gz
+
+# Jupyter
+.ipynb_checkpoints
+
+# Project-specific
+generated/
+output/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Docker
+docker-compose.override.yml
+.docker/
+Dockerfile.*
+!Dockerfile
+
+# MCP
+.mcp/
+
+# Research (not needed in runtime)
+research/
+
+# Lock file verification (will be checked in Dockerfile)
+# uv.lock should be included for explicit dependency locking

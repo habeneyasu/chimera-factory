@@ -1,0 +1,172 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.uv/
+
+# Python version management
+pyvenv.cfg
+
+# Node.js / npm (for MCP servers)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnp.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+# Note: .cursor/rules and .cursor/mcp.json are required and should be committed
+.cursor/*
+!.cursor/rules
+!.cursor/mcp.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+# Note: .env.example should be committed (template file)
+
+# OS
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+test-results/
+junit.xml
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# Linting
+.ruff_cache/
+.flake8
+
+# Project specific
+*.log
+*.log.*
+logs/
+!logs/.gitkeep
+
+# Temporary commit messages
+COMMIT_MESSAGE.txt
+COMMIT_MESSAGE.md
+
+# MCP
+.mcp/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# CI/CD artifacts
+.github/workflows/*.yml.bak
+.github/workflows/*.yaml.bak
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Secrets and credentials
+secrets/
+*.pem
+*.key
+*.cert
+*.secret
+*.token
+credentials.json
+
+# Build artifacts
+*.whl
+*.tar.gz
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# Project-specific: Weaviate data
+weaviate_data/
+
+# Project-specific: Generated content
+generated/
+output/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Large dependency lock files (if too large, consider excluding)
+# Note: uv.lock is required for explicit dependency locking
+# If submission size is an issue, consider using requirements.txt instead
+# uv.lock
+research/

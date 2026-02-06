@@ -1,0 +1,201 @@
+# Docker Compose: Project Chimera
+# Prepared By: habeneyasu
+# Repository: https://github.com/habeneyasu/chimera-factory
+#
+# Usage:
+#   docker-compose up -d              # Start all services
+#   docker-compose up api             # Start only API service
+#   docker-compose up postgres weaviate redis   # Start database services
+#   docker-compose run --rm test       # Run tests
+#
+# Configuration is loaded from .env file
+# Copy .env.example to .env and update with your values
+#
+# Note: version field removed for compatibility with Docker Compose V2
+
+services:
+  # PostgreSQL Database (Transactional Data)
+  postgres:
+    image: postgres:16-alpine
+    container_name: chimera-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-chimera_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chimera-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Weaviate Vector Database (Semantic Memory)
+  weaviate:
+    image: semitechnologies/weaviate:1.24.0
+    container_name: chimera-weaviate
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=none
+      - ENABLE_MODULES=text2vec-openai,text2vec-cohere,text2vec-huggingface
+      - CLUSTER_HOSTNAME=node1
+    ports:
+      - "${WEAVIATE_PORT:-8080}:8080"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    networks:
+      - chimera-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (Episodic Cache & Task Queuing)
+  redis:
+    image: redis:7-alpine
+    container_name: chimera-redis
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chimera-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # API Server
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime  # Use runtime stage from multi-stage build
+    container_name: chimera-api
+    environment:
+      - PYTHONPATH=/app
+      - API_HOST=${API_HOST:-0.0.0.0}
+      - API_PORT=${API_PORT:-8000}
+      - API_RELOAD=${API_RELOAD:-false}
+      - API_WORKERS=${API_WORKERS:-4}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      # Database configuration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-chimera_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      # Redis configuration
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=${REDIS_DB:-0}
+      # Weaviate configuration (Semantic Memory)
+      - WEAVIATE_URL=${WEAVIATE_URL:-http://weaviate:8080}
+      - WEAVIATE_API_KEY=${WEAVIATE_API_KEY:-}
+      # External API keys (from .env)
+      - TWITTER_API_KEY=${TWITTER_API_KEY:-}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET:-}
+      - TWITTER_BEARER_TOKEN=${TWITTER_BEARER_TOKEN:-}
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID:-}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET:-}
+      - IDEOGRAM_API_KEY=${IDEOGRAM_API_KEY:-}
+      - RUNWAY_API_KEY=${RUNWAY_API_KEY:-}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN:-}
+      - TIKTOK_API_KEY=${TIKTOK_API_KEY:-}
+      - THREADS_API_KEY=${THREADS_API_KEY:-}
+      # OpenClaw Network Integration
+      - OPENCLAW_NETWORK_URL=${OPENCLAW_NETWORK_URL:-https://network.openclaw.io}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:-}
+      - OPENCLAW_MOCK_MODE=${OPENCLAW_MOCK_MODE:-true}
+      - OPENCLAW_USE_MCP=${OPENCLAW_USE_MCP:-false}
+      - MCP_CLIENT_URL=${MCP_CLIENT_URL:-http://localhost:8001}
+      - AGENT_NAME=${AGENT_NAME:-Chimera-Agent}
+    ports:
+      - "${API_PORT:-8000}:${API_PORT:-8000}"
+    volumes:
+      - .:/app
+      - logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      weaviate:
+        condition: service_healthy
+    networks:
+      - chimera-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-8000}/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Test Service (Test-focused image with dev dependencies)
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test  # Use test stage from multi-stage build
+    container_name: chimera-test
+    environment:
+      - PYTHONPATH=/app
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-chimera_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=${REDIS_DB:-0}
+      # Weaviate configuration (Semantic Memory)
+      - WEAVIATE_URL=${WEAVIATE_URL:-http://weaviate:8080}
+      - WEAVIATE_API_KEY=${WEAVIATE_API_KEY:-}
+      # OpenClaw Network Integration (mock mode for tests)
+      - OPENCLAW_NETWORK_URL=${OPENCLAW_NETWORK_URL:-https://network.openclaw.io}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:-}
+      - OPENCLAW_MOCK_MODE=${OPENCLAW_MOCK_MODE:-true}
+      - OPENCLAW_USE_MCP=${OPENCLAW_USE_MCP:-false}
+      - MCP_CLIENT_URL=${MCP_CLIENT_URL:-http://localhost:8001}
+      - AGENT_NAME=${AGENT_NAME:-Chimera-Agent}
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      weaviate:
+        condition: service_healthy
+    networks:
+      - chimera-network
+    command: uv run pytest tests/ -v --cov=src/chimera_factory --cov-report=term-missing
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  weaviate_data:
+    driver: local
+  logs:
+    driver: local
+
+networks:
+  chimera-network:
+    driver: bridge

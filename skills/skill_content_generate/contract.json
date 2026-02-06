@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Content Generation Skill Contract",
+  "description": "Input/Output contract for skill_content_generate",
+  "input": {
+    "type": "object",
+    "properties": {
+      "content_type": {
+        "type": "string",
+        "enum": ["text", "image", "video", "multimodal"],
+        "description": "Type of content to generate"
+      },
+      "prompt": {
+        "type": "string",
+        "description": "Content generation prompt"
+      },
+      "style": {
+        "type": "string",
+        "description": "Persona style guide reference"
+      },
+      "character_reference_id": {
+        "type": "string",
+        "description": "Character consistency lock ID for image/video generation"
+      }
+    },
+    "required": ["content_type", "prompt"]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "content_url": {
+        "type": "string",
+        "description": "URL or path to generated content"
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "platform": {"type": "string"},
+          "format": {"type": "string"},
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "width": {"type": "number"},
+              "height": {"type": "number"}
+            }
+          },
+          "duration": {"type": "number", "description": "Duration in seconds (for video)"}
+        }
+      },
+      "confidence": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "description": "Confidence score for content quality"
+      }
+    },
+    "required": ["content_url", "metadata", "confidence"]
+  }
+}

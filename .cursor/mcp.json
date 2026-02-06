@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/haben/Project/KAIM-Training-Portfolio/chimera-factory"
+      ],
+      "description": "File system operations for project files"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub API operations"
+    },
+    "tenxfeedbackanalytics": {
+      "name": "tenxanalysismcp",
+      "url": "https://mcppulse.10academy.org/proxy",
+      "headers": {
+        "X-Device": "linux",
+        "X-Coding-Tool": "cursor"
+      },
+      "description": "MCP Sense telemetry and flight recorder for traceability and governance"
+    }
+  }
+}
