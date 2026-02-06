@@ -174,3 +174,84 @@ class Campaign(BaseModel):
     agent_ids: List[UUID] = Field(description="List of agent UUIDs")
     created_at: datetime = Field(description="Creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
+
+
+# OpenClaw Integration API Models
+class OpenClawPublishRequest(BaseModel):
+    """Request model for publishing agent status to OpenClaw."""
+    
+    agent_id: UUID = Field(..., description="Agent identifier")
+    capabilities: List[str] = Field(..., description="Available skills")
+    status: str = Field(..., pattern="^(idle|researching|generating|engaging|sleeping)$", description="Current status")
+    resources: Optional[Dict[str, Any]] = Field(None, description="Resource metrics")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "agent_id": "123e4567-e89b-12d3-a456-426614174000",
+                "capabilities": ["trend_research", "content_generation"],
+                "status": "idle",
+                "resources": {
+                    "cpu_usage": 25.5,
+                    "memory_usage": 40.0,
+                    "queue_depth": 0
+                }
+            }
+        }
+    )
+
+
+class OpenClawPublishResponse(BaseModel):
+    """Response model for status publication."""
+    
+    publication_id: UUID = Field(default_factory=uuid4, description="Publication identifier")
+    agent_id: UUID = Field(..., description="Agent identifier")
+    published_at: datetime = Field(default_factory=datetime.now, description="Publication timestamp")
+    network_reachable: bool = Field(..., description="Whether network is reachable")
+
+
+class OpenClawDiscoverRequest(BaseModel):
+    """Request model for discovering agents."""
+    
+    capabilities: Optional[List[str]] = Field(None, description="Required capabilities")
+    status: Optional[str] = Field(None, pattern="^(idle|available)$", description="Filter by agent status")
+    min_reputation: Optional[float] = Field(None, ge=0, le=1, description="Minimum reputation score")
+    limit: int = Field(10, ge=1, le=100, description="Maximum number of results")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "capabilities": ["trend_research"],
+                "status": "available",
+                "min_reputation": 0.7,
+                "limit": 10
+            }
+        }
+    )
+
+
+class OpenClawCollaborateRequest(BaseModel):
+    """Request model for collaboration."""
+    
+    requester_agent_id: UUID = Field(..., description="Requester agent identifier")
+    target_agent_id: UUID = Field(..., description="Target agent identifier")
+    task: str = Field(..., description="Task description")
+    required_capability: str = Field(..., pattern="^(trend_research|content_generation|engagement_management)$", description="Required capability")
+    input_data: Optional[Dict[str, Any]] = Field(None, description="Task input data")
+    deadline: Optional[datetime] = Field(None, description="Task deadline")
+    compensation: Optional[Dict[str, Any]] = Field(None, description="Compensation details")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "requester_agent_id": "123e4567-e89b-12d3-a456-426614174000",
+                "target_agent_id": "223e4567-e89b-12d3-a456-426614174000",
+                "task": "Research trends on AI ethics",
+                "required_capability": "trend_research",
+                "input_data": {
+                    "topic": "AI ethics",
+                    "sources": ["twitter", "news"]
+                }
+            }
+        }
+    )

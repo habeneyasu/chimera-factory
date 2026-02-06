@@ -186,7 +186,7 @@ The following MCP servers are selected and configured for Project Chimera develo
 **Environment Variables Required**:
 - `POSTGRES_CONNECTION_STRING`: PostgreSQL connection string
   - Format: `postgresql://user:password@host:port/database`
-  - Example: `postgresql://chimera:password@localhost:5432/chimera_dev`
+  - Example: `postgresql://user:password@host:port/database` (use environment variables)
 
 **Available Tools**: 10+ tools including:
 - `query`: Execute SQL query
@@ -250,10 +250,10 @@ The following MCP servers are selected and configured for Project Chimera develo
 **Environment Variables** (`.env` file, not committed):
 ```bash
 # GitHub MCP
-GITHUB_TOKEN=ghp_your_personal_access_token_here
+GITHUB_TOKEN=${GITHUB_TOKEN}
 
 # PostgreSQL MCP
-POSTGRES_CONNECTION_STRING=postgresql://chimera:password@localhost:5432/chimera_dev
+POSTGRES_CONNECTION_STRING=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-localhost}:${POSTGRES_HOST_PORT:-5433}/${POSTGRES_DB:-chimera_dev}
 ```
 
 ---

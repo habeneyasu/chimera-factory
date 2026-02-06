@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 from dotenv import load_dotenv
 
-from chimera_factory.api.routers import trends, content, engagement, agents, campaigns
+from chimera_factory.api.routers import trends, content, engagement, agents, campaigns, openclaw
 from chimera_factory.api.models import APIResponse, ErrorResponse
 from chimera_factory.exceptions import ChimeraError
 from chimera_factory.utils.logging import setup_logger
@@ -54,6 +54,7 @@ app.include_router(content.router, prefix="/api/v1/content", tags=["content"])
 app.include_router(engagement.router, prefix="/api/v1/engagement", tags=["engagement"])
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(campaigns.router, prefix="/api/v1/campaigns", tags=["campaigns"])
+app.include_router(openclaw.router, prefix="/api/v1/openclaw", tags=["openclaw"])
 
 
 @app.exception_handler(ChimeraError)

@@ -12,7 +12,7 @@ Reference:
 """
 
 from typing import Dict, Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from ._validation import (
     validate_required_field,
@@ -135,7 +135,6 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Save content plan to database
     try:
-        from uuid import UUID
         plan_id = save_content_plan(
             agent_id=UUID(agent_id) if isinstance(agent_id, str) else agent_id,
             content_type=content_type,

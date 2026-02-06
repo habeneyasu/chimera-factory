@@ -5,10 +5,13 @@ Reference: specs/database/schema.sql
 """
 
 import os
+import logging
 from psycopg2.pool import ThreadedConnectionPool
 from typing import Optional
 from contextlib import contextmanager
 from dotenv import load_dotenv, find_dotenv
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 # Use find_dotenv to locate the .env file in the project root
@@ -82,8 +85,6 @@ def get_connection_string() -> str:
             )
             
             if conn_str != original_conn_str:
-                import logging
-                logger = logging.getLogger(__name__)
                 logger.info(
                     f"Updated POSTGRES_CONNECTION_STRING: port 5432->5433, localhost->127.0.0.1 for IPv4 connection"
                 )
@@ -104,8 +105,6 @@ def get_connection_string() -> str:
     
     # If inside Docker but host is not "postgres", something is wrong
     if is_inside_docker and host != "postgres" and host != "localhost":
-        import logging
-        logger = logging.getLogger(__name__)
         logger.warning(
             f"Inside Docker but POSTGRES_HOST={host} (expected 'postgres'). "
             f"Using 'postgres' as fallback."
@@ -127,14 +126,8 @@ def get_connection_string() -> str:
     container_port = os.getenv("POSTGRES_PORT")
     
     # Debug logging
-    import logging
-    import sys
-    logger = logging.getLogger(__name__)
     logger.debug(f"Connection config - host: {host}, host_port: {host_port}, container_port: {container_port}")
-    # Also print to stderr for immediate visibility in tests
-    if "pytest" in sys.modules:
-        print(f"DEBUG Connection config - host: {host}, host_port: {host_port}, container_port: {container_port}", file=sys.stderr)
-        print(f"DEBUG POSTGRES_HOST env var: {os.getenv('POSTGRES_HOST', 'NOT SET')}", file=sys.stderr)
+    logger.debug(f"POSTGRES_HOST env var: {os.getenv('POSTGRES_HOST', 'NOT SET')}")
     
     # IMPORTANT: Inside Docker, POSTGRES_HOST should be "postgres" (service name)
     # and we should use container port (5432), NOT host port (5433)
@@ -174,14 +167,8 @@ def get_connection_string() -> str:
     conn_str = f"postgresql://{user}:{encoded_password}@{host}:{port}/{database}"
     
     # Debug: Log connection string (without password) for troubleshooting
-    import logging
-    import sys
-    logger = logging.getLogger(__name__)
     debug_msg = f"Database connection: postgresql://{user}:***@{host}:{port}/{database}"
-    logger.info(debug_msg)  # Changed to info for better visibility
-    # Also print to stderr for immediate visibility in tests
-    if "pytest" in sys.modules:
-        print(f"DEBUG: {debug_msg}", file=sys.stderr)
+    logger.info(debug_msg)
     
     return conn_str
 
@@ -284,7 +271,6 @@ def reset_connection_pool() -> None:
     _connection_string = None
     
     # Force reload of environment variables
-    from dotenv import load_dotenv
     load_dotenv(override=True)
 
 
@@ -300,8 +286,8 @@ def test_connection() -> bool:
             with conn.cursor() as cur:
                 cur.execute("SELECT version();")
                 version = cur.fetchone()
-                print(f"✅ Database connected: PostgreSQL {version[0]}")
+                logger.info(f"Database connected: PostgreSQL {version[0]}")
         return True
     except Exception as e:
-        print(f"❌ Database connection test failed: {e}")
+        logger.error(f"Database connection test failed: {e}")
         return False

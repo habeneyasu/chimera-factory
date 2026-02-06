@@ -111,8 +111,6 @@ docker-compose.override.yml
 *.tmp
 *.temp
 *.bak
-COMMIT_MESSAGE.txt
-COMMIT_MESSAGE.md
 
 # Database
 *.db

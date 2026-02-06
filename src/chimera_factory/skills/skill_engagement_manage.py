@@ -12,7 +12,7 @@ Reference:
 """
 
 from typing import Dict, Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from ._validation import (
     validate_required_field,
@@ -148,7 +148,6 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
         
         # Save to database
         try:
-            from uuid import UUID
             db_engagement_id = save_engagement(
                 agent_id=UUID(agent_id) if isinstance(agent_id, str) else agent_id,
                 platform=platform,
@@ -179,7 +178,6 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         # Save failed engagement to database
         try:
-            from uuid import UUID
             save_engagement(
                 agent_id=UUID(agent_id) if isinstance(agent_id, str) else agent_id,
                 platform=platform,

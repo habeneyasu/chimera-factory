@@ -42,7 +42,8 @@ Create a `.env` file in the project root (not committed to git):
 GITHUB_TOKEN=your_github_personal_access_token_here
 
 # PostgreSQL MCP Server
-POSTGRES_CONNECTION_STRING=postgresql://user:password@localhost:5432/chimera_dev
+# Format: postgresql://user:password@host:port/database
+POSTGRES_CONNECTION_STRING=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-localhost}:${POSTGRES_HOST_PORT:-5433}/${POSTGRES_DB:-chimera_dev}
 
 # Runtime MCP Servers (for future use)
 TWITTER_API_KEY=your_twitter_api_key
