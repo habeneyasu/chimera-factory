@@ -89,6 +89,12 @@ dmypy.json
 # Project specific
 *.log
 *.log.*
+logs/
+!logs/.gitkeep
+
+# Temporary commit messages
+COMMIT_MESSAGE.txt
+COMMIT_MESSAGE.md
 
 # MCP
 .mcp/
@@ -105,6 +111,8 @@ docker-compose.override.yml
 *.tmp
 *.temp
 *.bak
+COMMIT_MESSAGE.txt
+COMMIT_MESSAGE.md
 
 # Database
 *.db

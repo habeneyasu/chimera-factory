@@ -4,19 +4,34 @@ Logging and audit trail utilities for Project Chimera.
 Reference: specs/_meta.md (100% of agent actions logged)
 """
 
+import os
 import logging
 import json
 from datetime import datetime
 from typing import Dict, Any, Optional
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Get log file path from environment or use default
+LOG_FILE = os.getenv("LOG_FILE", "logs/chimera_factory.log")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+# Create logs directory if it doesn't exist
+log_path = Path(LOG_FILE)
+if log_path.parent != Path("."):
+    log_path.parent.mkdir(parents=True, exist_ok=True)
 
 # Configure root logger
+handlers = [logging.StreamHandler()]
+if LOG_FILE:
+    handlers.append(logging.FileHandler(LOG_FILE))
+
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, LOG_LEVEL, logging.INFO),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('chimera_factory.log'),
-        logging.StreamHandler()
-    ]
+    handlers=handlers
 )
 
 

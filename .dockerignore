@@ -62,10 +62,11 @@ dmypy.json
 .ruff_cache/
 .flake8
 
-# Environment variables
+# Environment variables (but keep .env.example)
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # OS
 .DS_Store

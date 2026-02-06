@@ -4,6 +4,7 @@ Database model operations for Project Chimera.
 Reference: specs/database/schema.sql
 """
 
+import json
 from typing import Dict, Any, Optional, List
 from uuid import UUID, uuid4
 from psycopg2.extras import RealDictCursor
@@ -100,8 +101,6 @@ def save_content_plan(
     Raises:
         DatabaseError: If database operation fails
     """
-    import json
-    
     plan_id = uuid4()
     
     try:
@@ -159,29 +158,10 @@ def save_content(
         
     Returns:
         UUID of saved content
-    """
-    """
-    Save generated content to the database.
-    
-    Reference: specs/database/schema.sql (content table)
-    
-    Args:
-        plan_id: Content plan UUID
-        agent_id: Agent UUID
-        content_type: Type of content
-        content_url: URL to content
-        metadata: Content metadata (JSONB)
-        confidence_score: Confidence score (0-1)
-        status: Content status (pending, approved, rejected, published)
-        
-    Returns:
-        UUID of saved content
         
     Raises:
         DatabaseError: If database operation fails
     """
-    import json
-    
     content_id = uuid4()
     
     try:
@@ -238,29 +218,10 @@ def save_engagement(
         
     Returns:
         UUID of saved engagement
-    """
-    """
-    Save engagement action to the database.
-    
-    Reference: specs/database/schema.sql (engagements table)
-    
-    Args:
-        agent_id: Agent UUID
-        platform: Platform name
-        action: Action type (reply, like, follow, comment, share)
-        target_id: Target post/comment/user ID
-        status: Engagement status
-        platform_response: Optional platform response (JSONB)
-        content_id: Optional related content UUID
-        
-    Returns:
-        UUID of saved engagement
         
     Raises:
         DatabaseError: If database operation fails
     """
-    import json
-    
     engagement_id = uuid4()
     
     try:

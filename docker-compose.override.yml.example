@@ -1,0 +1,31 @@
+# docker-compose.override.yml.example
+# Copy this file to docker-compose.override.yml for local development overrides
+# This file is gitignored and allows you to customize Docker Compose for your local environment
+#
+# Usage:
+#   cp docker-compose.override.yml.example docker-compose.override.yml
+#   # Edit docker-compose.override.yml with your local settings
+#
+# Override files are automatically merged with docker-compose.yml
+#
+# Note: version field removed for compatibility with Docker Compose V2
+
+services:
+  api:
+    # Override API settings for local development
+    environment:
+      - API_RELOAD=true  # Enable auto-reload in development
+      - LOG_LEVEL=debug
+    volumes:
+      - .:/app  # Mount source code for live reload
+      - logs:/app/logs
+
+  postgres:
+    # Override database settings if needed
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port for local access
+
+  redis:
+    # Override Redis settings if needed
+    ports:
+      - "6379:6379"  # Expose Redis port for local access

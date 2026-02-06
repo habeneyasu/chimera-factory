@@ -1,18 +1,39 @@
 .PHONY: setup test test-unit test-integration test-contracts test-e2e test-all spec-check validate-task2 test-criteria clean help
+.PHONY: docker-up docker-down docker-build docker-logs docker-ps docker-api docker-db docker-test docker-shell
 
 help:
 	@echo "Project Chimera - Makefile Commands"
 	@echo ""
+	@echo "Setup & Development:"
 	@echo "  make setup              - Install dependencies"
+	@echo "  make run-api            - Start API server (local)"
+	@echo "  make run-api-dev        - Start API server in dev mode"
+	@echo ""
+	@echo "Testing:"
 	@echo "  make test               - Run tests in Docker"
 	@echo "  make test-unit          - Run unit tests"
 	@echo "  make test-integration   - Run integration tests"
 	@echo "  make test-contracts     - Run contract tests (API & Skills)"
 	@echo "  make test-e2e           - Run end-to-end tests"
 	@echo "  make test-all           - Run all tests with coverage"
+	@echo ""
+	@echo "Docker Commands:"
+	@echo "  make docker-up          - Start all services (API, PostgreSQL, Redis)"
+	@echo "  make docker-down        - Stop all services"
+	@echo "  make docker-build       - Build Docker images"
+	@echo "  make docker-logs        - View logs from all services"
+	@echo "  make docker-ps          - List running containers"
+	@echo "  make docker-api         - Start only API service"
+	@echo "  make docker-db          - Start database services (PostgreSQL, Redis)"
+	@echo "  make docker-test        - Run tests in Docker container"
+	@echo "  make docker-shell       - Open shell in API container"
+	@echo ""
+	@echo "Validation:"
 	@echo "  make spec-check         - Verify code aligns with specs"
 	@echo "  make validate-task2     - Validate Task 2 deliverables"
 	@echo "  make test-criteria      - Show test criteria summary"
+	@echo ""
+	@echo "Cleanup:"
 	@echo "  make clean              - Clean build artifacts"
 
 setup:
@@ -23,11 +44,71 @@ setup:
 test:
 	@echo "Running tests in Docker..."
 	@if [ -f "docker-compose.yml" ]; then \
-		docker compose run --rm test; \
+		$(DOCKER_COMPOSE) --profile test run --rm test; \
 	else \
 		echo "ERROR: docker-compose.yml not found"; \
 		exit 1; \
 	fi
+
+# Docker Commands
+# Detect Docker Compose version (V1: docker-compose, V2: docker compose)
+DOCKER_COMPOSE = $(shell which docker-compose > /dev/null 2>&1 && echo docker-compose || echo docker compose)
+
+docker-up:
+	@echo "Starting all services (API, PostgreSQL, Redis)..."
+	@echo "Checking for port conflicts..."
+	@if lsof -i :5432 >/dev/null 2>&1 && [ -z "$$POSTGRES_HOST_PORT" ]; then \
+		echo "⚠️  Warning: Port 5432 is in use. Using port 5433 for PostgreSQL."; \
+		echo "   Set POSTGRES_HOST_PORT in .env to use a different port."; \
+	fi
+	@if lsof -i :6379 >/dev/null 2>&1 && [ -z "$$REDIS_HOST_PORT" ]; then \
+		echo "⚠️  Warning: Port 6379 is in use. Using port 6380 for Redis."; \
+		echo "   Set REDIS_HOST_PORT in .env to use a different port."; \
+	fi
+	@echo "Building images if needed..."
+	@$(DOCKER_COMPOSE) build --quiet api 2>/dev/null || $(DOCKER_COMPOSE) build api
+	@echo "Starting services..."
+	@$(DOCKER_COMPOSE) up -d
+	@echo "✓ Services started. Use 'make docker-logs' to view logs"
+	@echo ""
+	@echo "Service URLs:"
+	@echo "  API:      http://localhost:$${API_PORT:-8000}/api/v1/docs"
+	@echo "  Postgres: localhost:$${POSTGRES_HOST_PORT:-5433}"
+	@echo "  Redis:    localhost:$${REDIS_HOST_PORT:-6380}"
+
+docker-down:
+	@echo "Stopping all services..."
+	@$(DOCKER_COMPOSE) down
+	@echo "✓ Services stopped"
+
+docker-build:
+	@echo "Building Docker images..."
+	@$(DOCKER_COMPOSE) build
+	@echo "✓ Images built"
+
+docker-logs:
+	@$(DOCKER_COMPOSE) logs -f
+
+docker-ps:
+	@$(DOCKER_COMPOSE) ps
+
+docker-api:
+	@echo "Starting API service..."
+	@$(DOCKER_COMPOSE) up -d api
+	@echo "✓ API service started"
+
+docker-db:
+	@echo "Starting database services (PostgreSQL, Redis)..."
+	@$(DOCKER_COMPOSE) up -d postgres redis
+	@echo "✓ Database services started"
+
+docker-test:
+	@echo "Running tests in Docker container..."
+	@$(DOCKER_COMPOSE) --profile test run --rm test
+
+docker-shell:
+	@echo "Opening shell in API container..."
+	@$(DOCKER_COMPOSE) exec api /bin/bash
 
 spec-check:
 	@echo "=========================================="

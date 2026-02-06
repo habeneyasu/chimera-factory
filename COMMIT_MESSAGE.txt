@@ -1,12 +1,14 @@
-refactor: move sensitive config to .env and clean up codebase
+feat: complete containerization and configuration management
 
-- Move all sensitive configuration to .env (API host/port, database, Redis, API keys, CORS)
+- Add full Docker stack (API, PostgreSQL, Redis) with health checks
+- Externalize all sensitive config to .env (ports, credentials, API keys)
 - Create .env.example template with all configuration variables
-- Remove duplicate model definitions (TrendItem/TrendResearchResponse)
-- Remove placeholder test files and empty documentation
-- Create BaseAPIClient to reduce API client code duplication
-- Update scripts and code to read from environment variables
-- Clean up generated files (htmlcov, logs, cache)
+- Add Docker commands to Makefile (docker-up, docker-down, docker-build, etc.)
+- Fix port conflicts (PostgreSQL: 5433, Redis: 6380 by default)
+- Auto-detect Docker Compose version (V1/V2 compatibility)
 
-All hardcoded sensitive values (ports, credentials, API keys) are now externalized
-to .env file for better security and configuration management.
+- Remove duplicate model definitions and unnecessary files
+- Clean up code inconsistencies (imports, docstrings)
+- Update .gitignore for temporary files and logs
+
+All services now run in Docker with environment-based configuration.
