@@ -2,6 +2,21 @@
 
 **Project Chimera** is fully containerized using Docker and Docker Compose for consistent development and deployment.
 
+## Multi-Stage Build Architecture
+
+The Dockerfile uses a **multi-stage build** for optimized containerization:
+
+1. **Builder Stage**: Installs dependencies and builds the package
+2. **Runtime Stage**: Production API image (minimal, optimized)
+3. **Test Stage**: Test-focused image with dev dependencies
+
+### Benefits
+
+- **Smaller Images**: Runtime image only contains production dependencies
+- **Better Caching**: Dependency layers cached separately from application code
+- **Explicit Dependency Locking**: `uv.lock` is verified and required
+- **Test-Focused Image**: Dedicated test image with all dev dependencies
+
 ## Quick Start
 
 ### Prerequisites
@@ -36,6 +51,44 @@ make docker-down
 # Or manually
 docker compose down
 ```
+
+## Building Images
+
+### Build All Images
+
+```bash
+# Build all images (runtime and test)
+make docker-build
+
+# Or manually
+docker compose build
+```
+
+### Build Specific Stages
+
+```bash
+# Build runtime image only
+make docker-build-runtime
+
+# Build test image only
+make docker-build-test
+
+# Or manually
+docker build --target runtime -t chimera-factory:runtime -f Dockerfile .
+docker build --target test -t chimera-factory:test -f Dockerfile .
+```
+
+### Verify Dependency Lock File
+
+```bash
+# Verify uv.lock exists and is up to date
+make docker-verify-lock
+
+# Or manually
+uv lock --check
+```
+
+**Important**: The Dockerfile requires `uv.lock` for explicit dependency locking. Always commit `uv.lock` after running `uv lock`.
 
 ## Services
 
@@ -92,6 +145,33 @@ docker compose exec redis redis-cli
 # View Redis logs
 docker compose logs -f redis
 ```
+
+## Running Tests
+
+### Run Tests in Docker
+
+```bash
+# Run tests using test-focused image
+make docker-test
+
+# Run full test suite with coverage
+make docker-test-full
+
+# Or manually
+docker compose --profile test run --rm test
+```
+
+The test service uses a dedicated **test-focused image** that includes:
+- All dev dependencies (pytest, pytest-cov, mypy, ruff)
+- Test files and configuration
+- Coverage reporting tools
+
+### Test Image Benefits
+
+- **Isolated Environment**: Tests run in a clean, reproducible environment
+- **CI/CD Ready**: Same image used in GitHub Actions CI pipeline
+- **Fast Iteration**: Test image cached separately from runtime image
+- **Full Coverage**: All test dependencies included
 
 ## Configuration
 

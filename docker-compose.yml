@@ -80,6 +80,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime  # Use runtime stage from multi-stage build
     container_name: chimera-api
     environment:
       - PYTHONPATH=/app
@@ -143,11 +144,12 @@ services:
       retries: 3
       start_period: 40s
 
-  # Test Service
+  # Test Service (Test-focused image with dev dependencies)
   test:
     build:
       context: .
       dockerfile: Dockerfile
+      target: test  # Use test stage from multi-stage build
     container_name: chimera-test
     environment:
       - PYTHONPATH=/app

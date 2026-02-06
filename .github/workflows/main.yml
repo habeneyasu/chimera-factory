@@ -83,12 +83,21 @@ jobs:
           echo "Waiting for services to be healthy..."
           timeout 60 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 2; done' || true
 
-      - name: Build Docker image
-        run: docker compose build test
+      - name: Verify dependency lock file
+        run: |
+          if [ ! -f "uv.lock" ]; then
+            echo "❌ ERROR: uv.lock not found. Explicit dependency locking required."
+            exit 1
+          fi
+          echo "✓ uv.lock exists (explicit dependency locking verified)"
 
-      - name: Run tests
+      - name: Build test-focused Docker image
+        run: docker build --target test -t chimera-factory:test -f Dockerfile .
+
+      - name: Run tests in test image
         id: test_run
-        run: make test || echo "exit_code=$?" >> $GITHUB_OUTPUT
+        run: |
+          docker compose --profile test run --rm test || echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       - name: Stop services
         if: always()
@@ -155,8 +164,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Verify Dockerfile builds
-        run: docker build -t chimera-factory:test -f Dockerfile .
+      - name: Verify dependency lock file
+        run: |
+          if [ ! -f "uv.lock" ]; then
+            echo "❌ ERROR: uv.lock not found. Explicit dependency locking required."
+            exit 1
+          fi
+          echo "✓ uv.lock exists (explicit dependency locking verified)"
+
+      - name: Build runtime Docker image (multi-stage)
+        run: docker build --target runtime -t chimera-factory:runtime -f Dockerfile .
+
+      - name: Build test Docker image (multi-stage)
+        run: docker build --target test -t chimera-factory:test -f Dockerfile .
 
       - name: Verify docker-compose
         run: docker compose config

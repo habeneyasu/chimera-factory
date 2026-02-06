@@ -20,12 +20,16 @@ help:
 	@echo "Docker Commands:"
 	@echo "  make docker-up          - Start all services (API, PostgreSQL, Weaviate, Redis)"
 	@echo "  make docker-down        - Stop all services"
-	@echo "  make docker-build       - Build Docker images"
+	@echo "  make docker-build       - Build all Docker images"
+	@echo "  make docker-build-runtime - Build runtime image (multi-stage)"
+	@echo "  make docker-build-test - Build test-focused image (multi-stage)"
+	@echo "  make docker-verify-lock - Verify dependency lock file (uv.lock)"
 	@echo "  make docker-logs        - View logs from all services"
 	@echo "  make docker-ps          - List running containers"
 	@echo "  make docker-api         - Start only API service"
 	@echo "  make docker-db          - Start database services (PostgreSQL, Weaviate, Redis)"
-	@echo "  make docker-test        - Run tests in Docker container"
+	@echo "  make docker-test        - Run tests in Docker container (test image)"
+	@echo "  make docker-test-full   - Run full test suite with coverage"
 	@echo "  make docker-shell       - Open shell in API container"
 	@echo ""
 	@echo "Validation:"
@@ -87,6 +91,27 @@ docker-build:
 	@$(DOCKER_COMPOSE) build
 	@echo "✓ Images built"
 
+docker-build-test:
+	@echo "Building test-focused Docker image..."
+	@docker build --target test -t chimera-factory:test -f Dockerfile .
+	@echo "✓ Test image built"
+
+docker-build-runtime:
+	@echo "Building runtime Docker image..."
+	@docker build --target runtime -t chimera-factory:runtime -f Dockerfile .
+	@echo "✓ Runtime image built"
+
+docker-verify-lock:
+	@echo "Verifying dependency lock file..."
+	@if [ ! -f "uv.lock" ]; then \
+		echo "❌ ERROR: uv.lock not found. Run 'uv lock' to generate lock file."; \
+		exit 1; \
+	fi
+	@echo "✓ uv.lock exists"
+	@echo "Verifying lock file is up to date..."
+	@uv lock --check || (echo "⚠️  WARNING: uv.lock may be out of date. Run 'uv lock' to update."; exit 1)
+	@echo "✓ uv.lock is up to date"
+
 docker-logs:
 	@$(DOCKER_COMPOSE) logs -f
 
@@ -104,8 +129,17 @@ docker-db:
 	@echo "✓ Database services started"
 
 docker-test:
-	@echo "Running tests in Docker container..."
+	@echo "Running tests in Docker container (test-focused image)..."
 	@$(DOCKER_COMPOSE) --profile test run --rm test
+
+docker-test-full:
+	@echo "Running full test suite in Docker (with coverage)..."
+	@$(DOCKER_COMPOSE) --profile test run --rm test uv run pytest tests/ -v \
+		--cov=src/chimera_factory \
+		--cov-report=term-missing \
+		--cov-report=html \
+		--cov-report=xml
+	@echo "✓ Test suite completed. Coverage reports generated."
 
 docker-shell:
 	@echo "Opening shell in API container..."

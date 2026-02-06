@@ -132,7 +132,7 @@ Each skill has a well-defined contract (JSON Schema) and Pydantic models.
 - **Database**: PostgreSQL (transactional), Weaviate (semantic memory/RAG), Redis (cache/queues)
 - **APIs**: Twitter, News, Reddit, Ideogram, Runway, Instagram, TikTok
 - **Network**: OpenClaw agent social network (with Local Sovereign Runtime for security)
-- **Containerization**: Docker & Docker Compose
+- **Containerization**: Docker & Docker Compose (multi-stage builds, explicit dependency locking)
 - **Security**: Air-gapped local execution environment for OpenClaw to prevent RCE vulnerabilities
 
 ---
