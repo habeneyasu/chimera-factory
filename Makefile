@@ -18,13 +18,13 @@ help:
 	@echo "  make test-all           - Run all tests with coverage"
 	@echo ""
 	@echo "Docker Commands:"
-	@echo "  make docker-up          - Start all services (API, PostgreSQL, Redis)"
+	@echo "  make docker-up          - Start all services (API, PostgreSQL, Weaviate, Redis)"
 	@echo "  make docker-down        - Stop all services"
 	@echo "  make docker-build       - Build Docker images"
 	@echo "  make docker-logs        - View logs from all services"
 	@echo "  make docker-ps          - List running containers"
 	@echo "  make docker-api         - Start only API service"
-	@echo "  make docker-db          - Start database services (PostgreSQL, Redis)"
+	@echo "  make docker-db          - Start database services (PostgreSQL, Weaviate, Redis)"
 	@echo "  make docker-test        - Run tests in Docker container"
 	@echo "  make docker-shell       - Open shell in API container"
 	@echo ""
@@ -55,7 +55,7 @@ test:
 DOCKER_COMPOSE = $(shell which docker-compose > /dev/null 2>&1 && echo docker-compose || echo docker compose)
 
 docker-up:
-	@echo "Starting all services (API, PostgreSQL, Redis)..."
+	@echo "Starting all services (API, PostgreSQL, Weaviate, Redis)..."
 	@echo "Checking for port conflicts..."
 	@if lsof -i :5432 >/dev/null 2>&1 && [ -z "$$POSTGRES_HOST_PORT" ]; then \
 		echo "⚠️  Warning: Port 5432 is in use. Using port 5433 for PostgreSQL."; \
@@ -74,6 +74,7 @@ docker-up:
 	@echo "Service URLs:"
 	@echo "  API:      http://localhost:$${API_PORT:-8000}/api/v1/docs"
 	@echo "  Postgres: localhost:$${POSTGRES_HOST_PORT:-5433}"
+	@echo "  Weaviate: http://localhost:$${WEAVIATE_PORT:-8080}"
 	@echo "  Redis:    localhost:$${REDIS_HOST_PORT:-6380}"
 
 docker-down:
@@ -98,8 +99,8 @@ docker-api:
 	@echo "✓ API service started"
 
 docker-db:
-	@echo "Starting database services (PostgreSQL, Redis)..."
-	@$(DOCKER_COMPOSE) up -d postgres redis
+	@echo "Starting database services (PostgreSQL, Weaviate, Redis)..."
+	@$(DOCKER_COMPOSE) up -d postgres weaviate redis
 	@echo "✓ Database services started"
 
 docker-test:

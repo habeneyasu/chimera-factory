@@ -48,7 +48,7 @@ cp .env.example .env
 # Install dependencies
 make setup
 
-# Start services (PostgreSQL, Redis, API)
+# Start services (PostgreSQL, Weaviate, Redis, API)
 make docker-up
 
 # Run tests
@@ -59,6 +59,7 @@ make test
 
 - **API Documentation**: http://localhost:8000/api/v1/docs
 - **PostgreSQL**: localhost:5433
+- **Weaviate**: http://localhost:8080
 - **Redis**: localhost:6380
 
 ---
@@ -88,13 +89,14 @@ graph TB
     end
 
     subgraph "Data & Runtime"
-        DB[(PostgreSQL + pgvector)];
+        DB[(PostgreSQL)];
+        VEC[(Weaviate)];
         KV[(Redis)];
         DOCKER[Docker Runtime];
     end
 
     R & G & E --> API & OC;
-    R & G & E --> DB & KV;
+    R & G & E --> DB & VEC & KV;
     
     S --> J[Judge Agent];
     DB --> J;
@@ -127,7 +129,7 @@ Each skill has a well-defined contract (JSON Schema) and Pydantic models.
 ### Technology Stack
 
 - **Backend**: FastAPI (Python 3.12+)
-- **Database**: PostgreSQL + pgvector (Transactional & Semantic Long-Term Memory), Redis (cache/queues)
+- **Database**: PostgreSQL (transactional), Weaviate (semantic memory/RAG), Redis (cache/queues)
 - **APIs**: Twitter, News, Reddit, Ideogram, Runway, Instagram, TikTok
 - **Network**: OpenClaw agent social network (with Local Sovereign Runtime for security)
 - **Containerization**: Docker & Docker Compose
@@ -166,7 +168,7 @@ chimera-factory/
 | **Spec-Driven Development** | ✅ | Intent as source of truth |
 | **REST API** | ✅ | FastAPI with OpenAPI docs |
 | **Agent Skills** | ✅ | 3 core skills implemented |
-| **Database Persistence** | ✅ | PostgreSQL + pgvector with connection pooling (RAG-ready) |
+| **Database Persistence** | ✅ | PostgreSQL (transactional), Weaviate (semantic memory/RAG), Redis (cache/queues) |
 | **Caching & Rate Limiting** | ✅ | Redis-based caching and rate limits |
 | **Local Sovereign Runtime** | ✅ | Air-gapped local execution environment for OpenClaw to prevent RCE vulnerabilities and protect agent identity |
 | **OpenClaw Integration** | ✅ | Agent network participation |

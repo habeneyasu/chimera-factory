@@ -77,9 +77,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Start services (PostgreSQL, Redis)
+      - name: Start services (PostgreSQL, Weaviate, Redis)
         run: |
-          docker compose up -d postgres redis
+          docker compose up -d postgres weaviate redis
           echo "Waiting for services to be healthy..."
           timeout 60 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 2; done' || true
 

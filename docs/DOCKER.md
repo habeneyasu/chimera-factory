@@ -12,7 +12,7 @@
 ### Start All Services
 
 ```bash
-# Start all services (API, PostgreSQL, Redis)
+# Start all services (API, PostgreSQL, Weaviate, Redis)
 make docker-up
 
 # Or manually
@@ -23,9 +23,10 @@ docker compose up -d
 
 - **API Server**: http://localhost:8000/api/v1/docs
 - **PostgreSQL**: localhost:5433 (default, configurable via `POSTGRES_HOST_PORT`)
+- **Weaviate**: http://localhost:8080 (default, configurable via `WEAVIATE_PORT`)
 - **Redis**: localhost:6380 (default, configurable via `REDIS_HOST_PORT`)
 
-**Note**: Default ports are 5433 and 6380 to avoid conflicts with local PostgreSQL/Redis installations. You can change these in `.env`.
+**Note**: Default ports are 5433 (PostgreSQL), 8080 (Weaviate), and 6380 (Redis) to avoid conflicts with local installations. You can change these in `.env`.
 
 ### Stop Services
 
@@ -55,7 +56,7 @@ make docker-shell
 
 ### PostgreSQL Database
 
-PostgreSQL database for persistent data storage.
+PostgreSQL database for transactional data storage.
 
 ```bash
 # Start only database services
@@ -68,9 +69,21 @@ docker compose exec postgres psql -U postgres -d chimera_dev
 docker compose logs -f postgres
 ```
 
+### Weaviate Vector Database
+
+Weaviate for semantic memory and RAG (Retrieval-Augmented Generation).
+
+```bash
+# Access Weaviate console
+open http://localhost:8080
+
+# View Weaviate logs
+docker compose logs -f weaviate
+```
+
 ### Redis Cache
 
-Redis for caching and rate limiting.
+Redis for episodic cache and task queuing.
 
 ```bash
 # Connect to Redis CLI
@@ -98,6 +111,11 @@ All configuration is loaded from `.env` file. The following environment variable
 - `POSTGRES_PASSWORD`: Database password (required)
 - `POSTGRES_PORT`: Database port inside container (default: `5432`)
 - `POSTGRES_HOST_PORT`: Host port mapping (default: `5433` to avoid conflicts)
+
+### Weaviate Configuration
+- `WEAVIATE_URL`: Weaviate server URL (default: `http://weaviate:8080` in Docker)
+- `WEAVIATE_API_KEY`: Weaviate API key (optional, for authentication)
+- `WEAVIATE_PORT`: Host port mapping (default: `8080`)
 
 ### Redis Configuration
 - `REDIS_HOST`: Redis host (default: `redis` in Docker)
@@ -163,6 +181,7 @@ make docker-shell       # Open shell in API container
 Docker Compose creates persistent volumes for:
 
 - `postgres_data`: PostgreSQL data directory
+- `weaviate_data`: Weaviate data directory
 - `redis_data`: Redis data directory
 - `logs`: Application logs
 
@@ -177,6 +196,7 @@ docker compose down -v
 All services include health checks:
 
 - **PostgreSQL**: Checks if database is ready
+- **Weaviate**: Checks if Weaviate is ready
 - **Redis**: Checks if Redis is responding
 - **API**: Checks if API health endpoint responds
 
@@ -194,7 +214,7 @@ POSTGRES_HOST_PORT=5434  # Change host port mapping
 REDIS_HOST_PORT=6381     # Change host port mapping
 ```
 
-**Note**: The default ports (5433 for PostgreSQL, 6380 for Redis) are chosen to avoid conflicts with common local installations. Inside containers, services still use standard ports (5432, 6379).
+**Note**: The default ports (5433 for PostgreSQL, 8080 for Weaviate, 6380 for Redis) are chosen to avoid conflicts with common local installations. Inside containers, services still use standard ports (5432, 8080, 6379).
 
 ### Database Connection Issues
 
@@ -233,7 +253,7 @@ For production:
 3. Configure proper `CORS_ORIGINS` (not `*`)
 4. Use strong passwords for database
 5. Configure proper logging levels
-6. Set up volume backups for PostgreSQL and Redis
+6. Set up volume backups for PostgreSQL, Weaviate, and Redis
 
 ---
 
