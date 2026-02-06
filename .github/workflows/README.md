@@ -49,6 +49,17 @@ CodeRabbit AI reviews are configured via `.coderabbit.yaml` in the repository ro
 - Validates security
 - Enforces Spec-Driven Development principles
 
+**Setup Instructions:**
+1. Install CodeRabbit GitHub App: https://github.com/apps/coderabbitai
+2. Enable for this repository
+3. CodeRabbit will automatically review PRs based on `.coderabbit.yaml`
+
+**Additional AI Review Workflow:**
+- `.github/workflows/ai-review.yml` provides enhanced spec alignment and security checks
+- Runs on every pull request
+- Validates spec references, security, and code quality
+- See `docs/AI_REVIEW_SETUP.md` for detailed documentation
+
 ## Local Testing
 
 To test the CI pipeline locally:

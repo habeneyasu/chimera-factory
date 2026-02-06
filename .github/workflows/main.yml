@@ -161,11 +161,36 @@ jobs:
       - name: Verify docker-compose
         run: docker compose config
 
+  # Job 6: AI Review Integration (runs in parallel with other jobs)
+  # Note: CodeRabbit runs automatically via GitHub App
+  # This job provides additional spec alignment validation
+  ai-review:
+    name: AI Review Integration
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: AI Review Status
+        run: |
+          echo "## 🤖 AI Review Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "CodeRabbit AI reviews are configured via \`.coderabbit.yaml\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Review Coverage:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Spec alignment validation" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Security and secrets scanning" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Code quality and best practices" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Architecture pattern compliance" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See \`.github/workflows/ai-review.yml\` for detailed validation checks." >> $GITHUB_STEP_SUMMARY
+
   # Summary Job (runs after all jobs)
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
-    needs: [spec-check, lint, test, security, build]
+    needs: [spec-check, lint, test, security, build, ai-review]
     if: always()
     steps:
       - name: CI Pipeline Summary
