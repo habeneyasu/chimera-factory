@@ -207,6 +207,8 @@ make clean      # Clean build artifacts
 
 ## 📚 Documentation
 
+- **Contributing Guide**: `CONTRIBUTING.md` - Development workflow, commit conventions, and PR process
+- **Architecture Decision Records**: `docs/adr/` - Key architectural decisions and alternatives
 - **API Documentation**: `docs/API.md`
 - **Docker Guide**: `docs/DOCKER.md`
 - **MCP Integration**: `docs/MCP_INTEGRATION.md`
