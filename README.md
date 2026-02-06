@@ -133,7 +133,7 @@ Each skill has a well-defined contract (JSON Schema) and Pydantic models.
 - **APIs**: Twitter, News, Reddit, Ideogram, Runway, Instagram, TikTok
 - **Network**: OpenClaw agent social network (with Local Sovereign Runtime for security)
 - **Containerization**: Docker & Docker Compose (multi-stage builds, explicit dependency locking)
-- **Security**: Air-gapped local execution environment for OpenClaw to prevent RCE vulnerabilities
+- **Security**: Air-gapped local execution environment, containment policy with forbidden operations, resource quotas, and automatic escalation triggers
 
 ---
 
@@ -210,6 +210,7 @@ make clean      # Clean build artifacts
 - **Contributing Guide**: `CONTRIBUTING.md` - Development workflow, commit conventions, and PR process
 - **Architecture Decision Records**: `docs/adr/` - Key architectural decisions and alternatives
 - **AI Review Setup**: `docs/AI_REVIEW_SETUP.md` - CodeRabbit and governance pipeline configuration
+- **Security Policy**: `specs/security_policy.md` - Containment policy with forbidden operations, resource quotas, and escalation triggers
 - **API Documentation**: `docs/API.md`
 - **Docker Guide**: `docs/DOCKER.md`
 - **MCP Integration**: `docs/MCP_INTEGRATION.md`

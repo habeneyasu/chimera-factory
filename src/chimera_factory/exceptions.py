@@ -95,3 +95,51 @@ class ValidationError(ChimeraError):
         """
         super().__init__(message, code="VALIDATION_ERROR", retryable=False)
         self.field = field
+
+
+# Security exceptions (from security/containment.py)
+class SecurityViolationError(ChimeraError):
+    """Raised when a forbidden operation is attempted."""
+    
+    def __init__(self, message: str, operation_type: str = None):
+        """
+        Initialize security violation error.
+        
+        Args:
+            message: Error message
+            operation_type: Type of operation that was forbidden
+        """
+        super().__init__(message, code="SECURITY_VIOLATION", retryable=False)
+        self.operation_type = operation_type
+
+
+class ResourceQuotaExceededError(ChimeraError):
+    """Raised when a resource quota is exceeded."""
+    
+    def __init__(self, message: str, resource_type: str = None):
+        """
+        Initialize resource quota exceeded error.
+        
+        Args:
+            message: Error message
+            resource_type: Type of resource that exceeded quota
+        """
+        super().__init__(message, code="RESOURCE_QUOTA_EXCEEDED", retryable=False)
+        self.resource_type = resource_type
+
+
+class EscalationTriggeredError(ChimeraError):
+    """Raised when an escalation trigger is activated."""
+    
+    def __init__(self, message: str, trigger: str = None, severity: str = None):
+        """
+        Initialize escalation triggered error.
+        
+        Args:
+            message: Error message
+            trigger: Trigger name
+            severity: Severity level
+        """
+        super().__init__(message, code="ESCALATION_TRIGGERED", retryable=False)
+        self.trigger = trigger
+        self.severity = severity
