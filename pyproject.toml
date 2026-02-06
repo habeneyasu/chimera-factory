@@ -5,6 +5,10 @@ description = "Project Chimera: The Factory that builds Autonomous AI Influencer
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.0.0",
+    "psycopg2-binary>=2.9.9",
+    "redis>=5.0.0",
+    "httpx>=0.25.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [build-system]
