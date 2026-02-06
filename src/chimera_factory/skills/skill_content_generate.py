@@ -24,6 +24,7 @@ from chimera_factory.api_clients import IdeogramClient, RunwayClient
 from chimera_factory.cache import get_cache, set_cache, cache_key
 from chimera_factory.utils import check_rate_limit, log_action, audit_log
 from chimera_factory.db import save_content_plan, save_content
+from chimera_factory.exceptions import ContentGenerationError, RateLimitError, APIError
 
 # Constants
 VALID_CONTENT_TYPES = ["text", "image", "video", "multimodal"]
@@ -89,33 +90,49 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
     # Check rate limit
     is_allowed, remaining = check_rate_limit("default", agent_id)
     if not is_allowed:
-        raise Exception(f"Rate limit exceeded. Remaining: {remaining}")
+        raise RateLimitError(
+            platform="default",
+            remaining=remaining or 0
+        )
     
     # Generate content based on type
     result = None
-    if content_type == "image":
-        result = _ideogram_client.generate_image(
-            prompt=prompt,
-            style=style,
-            character_reference_id=character_reference_id
-        )
-    elif content_type == "video":
-        result = _runway_client.generate_video(
-            prompt=prompt,
-            style=style,
-            character_reference_id=character_reference_id
-        )
-    else:
-        # Text or multimodal - use default generation
-        content_id = str(uuid4())
-        result = {
-            "content_url": f"https://chimera-factory.example.com/content/{content_id}",
-            "metadata": {
-                "platform": platform,
-                "format": content_type
-            },
-            "confidence": 0.85
-        }
+    try:
+        if content_type == "image":
+            result = _ideogram_client.generate_image(
+                prompt=prompt,
+                style=style,
+                character_reference_id=character_reference_id
+            )
+        elif content_type == "video":
+            result = _runway_client.generate_video(
+                prompt=prompt,
+                style=style,
+                character_reference_id=character_reference_id
+            )
+        else:
+            # Text or multimodal - use default generation
+            content_id = str(uuid4())
+            result = {
+                "content_url": f"https://chimera-factory.example.com/content/{content_id}",
+                "metadata": {
+                    "platform": platform,
+                    "format": content_type
+                },
+                "confidence": 0.85
+            }
+    except (ContentGenerationError, APIError) as e:
+        # Re-raise these exceptions so API router can handle them
+        raise
+    except RateLimitError as e:
+        # Re-raise rate limit errors
+        raise
+    except Exception as e:
+        # Wrap other exceptions in ContentGenerationError
+        raise ContentGenerationError(
+            f"Failed to generate {content_type} content: {str(e)}",
+            retryable=True
+        ) from e
     
     # Build metadata
     metadata = result.get("metadata", {})

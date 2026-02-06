@@ -29,6 +29,7 @@ from chimera_factory.api_clients import (
 )
 from chimera_factory.utils import check_rate_limit, log_action, audit_log
 from chimera_factory.db import save_engagement
+from chimera_factory.exceptions import EngagementError, RateLimitError, APIError
 
 # Constants
 VALID_ACTIONS = ["reply", "like", "follow", "comment", "share"]
@@ -104,6 +105,7 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
     # Check rate limit
     is_allowed, remaining = check_rate_limit(platform, agent_id)
     if not is_allowed:
+        # Return failed status instead of raising exception for engagement
         return {
             "status": "failed",
             "error": {
@@ -175,6 +177,22 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
             "platform_response": platform_response
         }
     
+    except (EngagementError, APIError, RateLimitError) as e:
+        # Re-raise these exceptions so API router can handle them
+        # But first, save failed engagement to database
+        try:
+            save_engagement(
+                agent_id=UUID(agent_id) if isinstance(agent_id, str) else agent_id,
+                platform=platform,
+                action=action,
+                target_id=target,
+                status="failed",
+                platform_response={"error": str(e)}
+            )
+        except Exception:
+            pass
+        # Re-raise the exception
+        raise
     except Exception as e:
         # Save failed engagement to database
         try:
@@ -189,11 +207,8 @@ def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
         except Exception:
             pass
         
-        return {
-            "status": "failed",
-            "error": {
-                "code": "API_ERROR",
-                "message": str(e),
-                "retryable": True
-            }
-        }
+        # Wrap in EngagementError for API router
+        raise EngagementError(
+            f"Failed to execute {action} on {platform}: {str(e)}",
+            retryable=True
+        ) from e

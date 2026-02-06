@@ -16,7 +16,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: chimera-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-chimera_dev}
@@ -27,6 +27,7 @@ services:
       - "${POSTGRES_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     networks:
       - chimera-network
     healthcheck:
@@ -88,6 +89,13 @@ services:
       - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN:-}
       - TIKTOK_API_KEY=${TIKTOK_API_KEY:-}
       - THREADS_API_KEY=${THREADS_API_KEY:-}
+      # OpenClaw Network Integration
+      - OPENCLAW_NETWORK_URL=${OPENCLAW_NETWORK_URL:-https://network.openclaw.io}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:-}
+      - OPENCLAW_MOCK_MODE=${OPENCLAW_MOCK_MODE:-true}
+      - OPENCLAW_USE_MCP=${OPENCLAW_USE_MCP:-false}
+      - MCP_CLIENT_URL=${MCP_CLIENT_URL:-http://localhost:8001}
+      - AGENT_NAME=${AGENT_NAME:-Chimera-Agent}
     ports:
       - "${API_PORT:-8000}:${API_PORT:-8000}"
     volumes:
@@ -124,6 +132,13 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=${REDIS_DB:-0}
+      # OpenClaw Network Integration (mock mode for tests)
+      - OPENCLAW_NETWORK_URL=${OPENCLAW_NETWORK_URL:-https://network.openclaw.io}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:-}
+      - OPENCLAW_MOCK_MODE=${OPENCLAW_MOCK_MODE:-true}
+      - OPENCLAW_USE_MCP=${OPENCLAW_USE_MCP:-false}
+      - MCP_CLIENT_URL=${MCP_CLIENT_URL:-http://localhost:8001}
+      - AGENT_NAME=${AGENT_NAME:-Chimera-Agent}
     volumes:
       - .:/app
     depends_on:
