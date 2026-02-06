@@ -80,23 +80,6 @@ def save_content_plan(
         
     Returns:
         UUID of saved content plan
-    """
-    """
-    Save a content plan to the database.
-    
-    Reference: specs/database/schema.sql (content_plans table)
-    
-    Args:
-        agent_id: Agent UUID
-        content_type: Type of content (text, image, video, multimodal)
-        platform: Target platform
-        confidence_score: Confidence score (0-1)
-        target_audience: Optional target audience
-        structure: Optional content structure (JSONB)
-        key_messages: Optional key messages (JSONB)
-        
-    Returns:
-        UUID of saved content plan
         
     Raises:
         DatabaseError: If database operation fails
@@ -254,17 +237,6 @@ def save_engagement(
 
 
 def get_agent_by_id(agent_id: UUID) -> Optional[Dict[str, Any]]:
-    """
-    Get agent by ID from database.
-    
-    Reference: specs/database/schema.sql (agents table)
-    
-    Args:
-        agent_id: Agent UUID
-        
-    Returns:
-        Agent data as dict or None if not found
-    """
     """
     Get agent by ID from database.
     

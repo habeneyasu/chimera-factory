@@ -14,11 +14,20 @@ from datetime import datetime
 from chimera_factory.db import (
     get_db_connection,
     test_connection,
+    reset_connection_pool,
     save_content_plan,
     save_content,
     save_engagement,
     get_agent_by_id,
 )
+
+
+@pytest.fixture(autouse=True, scope="function")
+def reset_db_pool():
+    """Reset database connection pool before each test to ensure fresh connections."""
+    reset_connection_pool()
+    yield
+    # Cleanup after test if needed
 
 
 @pytest.mark.integration
@@ -45,7 +54,22 @@ class TestContentPlanPersistence:
     
     def test_save_content_plan(self):
         """Test saving a content plan to database."""
+        # Create an agent first (required for foreign key constraint)
         agent_id = uuid4()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO agents (id, name, persona_id, wallet_address, status)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    str(agent_id),
+                    "Test Agent",
+                    "test_persona",
+                    f"0x{str(agent_id).replace('-', '').ljust(40, '0')}",  # Unique wallet address from agent_id (pad to 40 chars)
+                    "sleeping"
+                ))
+                conn.commit()
+        
         plan_id = save_content_plan(
             agent_id=agent_id,
             content_type="image",
@@ -61,12 +85,13 @@ class TestContentPlanPersistence:
         # Verify it was saved
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM content_plans WHERE id = %s", (plan_id,))
+                cur.execute("SELECT * FROM content_plans WHERE id = %s", (str(plan_id),))
                 result = cur.fetchone()
                 assert result is not None
-                assert result[1] == agent_id  # agent_id column
+                # Column order: id, agent_id, content_type, target_audience, platform, ...
+                assert str(result[1]) == str(agent_id)  # agent_id column (UUID)
                 assert result[2] == "image"  # content_type column
-                assert result[3] == "twitter"  # platform column
+                assert result[4] == "twitter"  # platform column (index 4, not 3)
 
 
 @pytest.mark.integration
@@ -75,7 +100,22 @@ class TestContentPersistence:
     
     def test_save_content(self):
         """Test saving content to database."""
+        # Create an agent first (required for foreign key constraint)
         agent_id = uuid4()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO agents (id, name, persona_id, wallet_address, status)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    str(agent_id),
+                    "Test Agent",
+                    "test_persona",
+                    f"0x{'b' * 40}",  # Dummy wallet address
+                    "sleeping"
+                ))
+                conn.commit()
+        
         plan_id = save_content_plan(
             agent_id=agent_id,
             content_type="image",
@@ -98,11 +138,12 @@ class TestContentPersistence:
         # Verify it was saved
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM content WHERE id = %s", (content_id,))
+                cur.execute("SELECT * FROM content WHERE id = %s", (str(content_id),))
                 result = cur.fetchone()
                 assert result is not None
-                assert result[1] == plan_id  # plan_id column
-                assert result[2] == agent_id  # agent_id column
+                # Column order: id, plan_id, agent_id, content_type, content_url, ...
+                assert str(result[1]) == str(plan_id)  # plan_id column (UUID)
+                assert str(result[2]) == str(agent_id)  # agent_id column (UUID)
                 assert result[3] == "image"  # content_type column
 
 
@@ -112,7 +153,22 @@ class TestEngagementPersistence:
     
     def test_save_engagement(self):
         """Test saving engagement to database."""
+        # Create an agent first (required for foreign key constraint)
         agent_id = uuid4()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO agents (id, name, persona_id, wallet_address, status)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    str(agent_id),
+                    "Test Agent",
+                    "test_persona",
+                    f"0x{'c' * 40}",  # Dummy wallet address
+                    "sleeping"
+                ))
+                conn.commit()
+        
         engagement_id = save_engagement(
             agent_id=agent_id,
             platform="twitter",
@@ -127,10 +183,11 @@ class TestEngagementPersistence:
         # Verify it was saved
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM engagements WHERE id = %s", (engagement_id,))
+                cur.execute("SELECT * FROM engagements WHERE id = %s", (str(engagement_id),))
                 result = cur.fetchone()
                 assert result is not None
-                assert result[1] == agent_id  # agent_id column
+                # Column order: id, agent_id, platform, action, target_id, content_id, status, ...
+                assert str(result[1]) == str(agent_id)  # agent_id column (UUID)
                 assert result[2] == "twitter"  # platform column
                 assert result[3] == "like"  # action column
                 assert result[4] == "tweet_12345"  # target_id column
@@ -190,11 +247,27 @@ class TestSkillsWithDatabase:
         """Test engagement management skill saves to database."""
         from chimera_factory.skills import skill_engagement_manage
         
+        # Create an agent first (required for foreign key constraint)
+        agent_id = uuid4()
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO agents (id, name, persona_id, wallet_address, status)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    str(agent_id),
+                    "Test Agent",
+                    "test_persona",
+                    f"0x{'d' * 40}",  # Dummy wallet address
+                    "sleeping"
+                ))
+                conn.commit()
+        
         input_data = {
             "action": "like",
             "platform": "twitter",
             "target": "tweet_12345",
-            "agent_id": str(uuid4())
+            "agent_id": str(agent_id)
         }
         
         output = skill_engagement_manage.execute(input_data)
@@ -206,8 +279,13 @@ class TestSkillsWithDatabase:
             assert "engagement_id" in output
             
             # Verify engagement was saved to database
+            engagement_id = output["engagement_id"]
+            # Convert to UUID if it's a string
+            if isinstance(engagement_id, str):
+                engagement_id = UUID(engagement_id)
+            
             with get_db_connection() as conn:
                 with conn.cursor() as cur:
-                    cur.execute("SELECT COUNT(*) FROM engagements WHERE id = %s", (output["engagement_id"],))
+                    cur.execute("SELECT COUNT(*) FROM engagements WHERE id = %s", (str(engagement_id),))
                     count = cur.fetchone()[0]
                     assert count == 1
