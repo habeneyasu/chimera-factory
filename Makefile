@@ -171,6 +171,18 @@ test-criteria:
 	@echo "  • User Story Coverage: 100%"
 	@echo ""
 
+run-api:
+	@echo "Starting Chimera Orchestrator API server..."
+	@uv run python scripts/run_api.py
+
+run-api-dev:
+	@echo "Starting API server in development mode..."
+	@uv run python scripts/run_api.py
+
+run-api-prod:
+	@echo "Starting API server in production mode..."
+	@API_RELOAD=false uv run python scripts/run_api.py
+
 clean:
 	@echo "Cleaning build artifacts..."
 	rm -rf __pycache__ .pytest_cache .mypy_cache .ruff_cache

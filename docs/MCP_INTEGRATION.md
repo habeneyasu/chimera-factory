@@ -1,6 +1,6 @@
 # MCP Integration Guide
 
-**Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)  
+**Repository**: [https://github.com/habeneyasu/chimera-factory](https://github.com/habeneyasu/chimera-factory)
 **Last Updated**: February 2026
 
 ## Overview

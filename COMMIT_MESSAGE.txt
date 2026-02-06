@@ -1,0 +1,12 @@
+refactor: move sensitive config to .env and clean up codebase
+
+- Move all sensitive configuration to .env (API host/port, database, Redis, API keys, CORS)
+- Create .env.example template with all configuration variables
+- Remove duplicate model definitions (TrendItem/TrendResearchResponse)
+- Remove placeholder test files and empty documentation
+- Create BaseAPIClient to reduce API client code duplication
+- Update scripts and code to read from environment variables
+- Clean up generated files (htmlcov, logs, cache)
+
+All hardcoded sensitive values (ports, credentials, API keys) are now externalized
+to .env file for better security and configuration management.

@@ -19,12 +19,25 @@ def get_redis_client() -> redis.Redis:
     """
     Get Redis client instance.
     
+    Reads configuration from environment variables:
+    - REDIS_URL: Full Redis URL (preferred)
+    - REDIS_HOST: Redis host (default: localhost)
+    - REDIS_PORT: Redis port (default: 6379)
+    - REDIS_DB: Redis database number (default: 0)
+    
     Returns:
         Redis client
     """
     global _redis_client
     if _redis_client is None:
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+        # Try full URL first
+        redis_url = os.getenv("REDIS_URL")
+        if not redis_url:
+            # Construct from individual components
+            host = os.getenv("REDIS_HOST", "localhost")
+            port = os.getenv("REDIS_PORT", "6379")
+            db = os.getenv("REDIS_DB", "0")
+            redis_url = f"redis://{host}:{port}/{db}"
         _redis_client = redis.from_url(redis_url, decode_responses=True)
     return _redis_client
 
