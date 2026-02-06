@@ -58,6 +58,7 @@ make test
 ### Access Services
 
 - **API Documentation**: http://localhost:8000/api/v1/docs
+- **HITL Review Interface**: http://localhost:8000/static/hitl-review.html
 - **PostgreSQL**: localhost:5433
 - **Weaviate**: http://localhost:8080
 - **Redis**: localhost:6380
@@ -211,6 +212,7 @@ make clean      # Clean build artifacts
 - **Architecture Decision Records**: `docs/adr/` - Key architectural decisions and alternatives
 - **AI Review Setup**: `docs/AI_REVIEW_SETUP.md` - CodeRabbit and governance pipeline configuration
 - **Security Policy**: `specs/security_policy.md` - Containment policy with forbidden operations, resource quotas, and escalation triggers
+- **Frontend Requirements**: `specs/frontend_requirements.md` - HITL review interface and agent monitoring dashboard
 - **API Documentation**: `docs/API.md`
 - **Docker Guide**: `docs/DOCKER.md`
 - **MCP Integration**: `docs/MCP_INTEGRATION.md`

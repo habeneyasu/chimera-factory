@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITL Review Interface - Project Chimera</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Human-in-the-Loop Review Interface</h1>
+            <p>Project Chimera: The Agentic Infrastructure Challenge</p>
+        </header>
+
+        <div class="info-box">
+            <p><strong>Purpose:</strong> Review content plans with confidence scores 0.70-0.90 that require human approval.</p>
+            <p><strong>Reference:</strong> <code>specs/functional.md</code> US-005, <code>specs/_meta.md</code> (HITL constraints)</p>
+        </div>
+
+        <section id="pending-approvals">
+            <h2>Pending Approvals</h2>
+            <div id="approvals-list" class="approvals-grid">
+                <p class="loading">Loading pending approvals...</p>
+            </div>
+        </section>
+
+        <section id="approval-detail" class="hidden">
+            <h2>Approval Details</h2>
+            <div id="detail-content"></div>
+            <div class="actions">
+                <button id="approve-btn" class="btn btn-approve">Approve</button>
+                <button id="reject-btn" class="btn btn-reject">Reject</button>
+                <button id="cancel-btn" class="btn btn-cancel">Cancel</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        
+        // Load pending approvals
+        async function loadPendingApprovals() {
+            try {
+                const response = await fetch(`${API_BASE}/approvals/pending?limit=20`);
+                const data = await response.json();
+                
+                if (data.success && data.data.approvals) {
+                    displayApprovals(data.data.approvals);
+                } else {
+                    document.getElementById('approvals-list').innerHTML = 
+                        '<p class="empty">No pending approvals</p>';
+                }
+            } catch (error) {
+                console.error('Error loading approvals:', error);
+                document.getElementById('approvals-list').innerHTML = 
+                    '<p class="error">Error loading approvals. Check API connection.</p>';
+            }
+        }
+        
+        function displayApprovals(approvals) {
+            const list = document.getElementById('approvals-list');
+            
+            if (approvals.length === 0) {
+                list.innerHTML = '<p class="empty">No pending approvals</p>';
+                return;
+            }
+            
+            list.innerHTML = approvals.map(approval => `
+                <div class="approval-card" data-id="${approval.approval_id}">
+                    <div class="approval-header">
+                        <span class="approval-id">${approval.approval_id.substring(0, 8)}...</span>
+                        <span class="confidence-badge confidence-${getConfidenceClass(approval.confidence_score)}">
+                            ${(approval.confidence_score * 100).toFixed(0)}%
+                        </span>
+                    </div>
+                    <div class="approval-content">
+                        <p class="content-preview">${approval.content_preview || 'No preview available'}</p>
+                        <div class="approval-meta">
+                            <span>Type: ${approval.content_type}</span>
+                            <span>Agent: ${approval.agent_id}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-view" onclick="viewApproval('${approval.approval_id}')">Review</button>
+                </div>
+            `).join('');
+        }
+        
+        function getConfidenceClass(score) {
+            if (score >= 0.85) return 'high';
+            if (score >= 0.75) return 'medium';
+            return 'low';
+        }
+        
+        async function viewApproval(approvalId) {
+            try {
+                const response = await fetch(`${API_BASE}/approvals/${approvalId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showApprovalDetail(data.data);
+                }
+            } catch (error) {
+                console.error('Error loading approval details:', error);
+                alert('Error loading approval details');
+            }
+        }
+        
+        function showApprovalDetail(approval) {
+            const detailSection = document.getElementById('approval-detail');
+            const detailContent = document.getElementById('detail-content');
+            
+            detailContent.innerHTML = `
+                <div class="detail-card">
+                    <h3>Content Details</h3>
+                    <div class="detail-item">
+                        <label>Approval ID:</label>
+                        <span>${approval.approval_id}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Content Type:</label>
+                        <span>${approval.content_type}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Confidence Score:</label>
+                        <span class="confidence-badge confidence-${getConfidenceClass(approval.confidence_score)}">
+                            ${(approval.confidence_score * 100).toFixed(0)}%
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Agent ID:</label>
+                        <span>${approval.agent_id}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Content:</label>
+                        <div class="content-display">${approval.content || approval.content_preview || 'No content available'}</div>
+                    </div>
+                    ${approval.content_metadata ? `
+                        <div class="detail-item">
+                            <label>Metadata:</label>
+                            <pre>${JSON.stringify(approval.content_metadata, null, 2)}</pre>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            detailSection.classList.remove('hidden');
+            
+            // Set up action buttons
+            document.getElementById('approve-btn').onclick = () => approveContent(approval.approval_id);
+            document.getElementById('reject-btn').onclick = () => rejectContent(approval.approval_id);
+            document.getElementById('cancel-btn').onclick = () => {
+                detailSection.classList.add('hidden');
+            };
+        }
+        
+        async function approveContent(approvalId) {
+            const feedback = prompt('Optional feedback for agent:');
+            
+            try {
+                const response = await fetch(`${API_BASE}/approvals/${approvalId}/approve`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({feedback: feedback || null})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Content approved successfully');
+                    document.getElementById('approval-detail').classList.add('hidden');
+                    loadPendingApprovals();
+                } else {
+                    alert('Error approving content: ' + (data.error?.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error approving content:', error);
+                alert('Error approving content');
+            }
+        }
+        
+        async function rejectContent(approvalId) {
+            const reason = prompt('Rejection reason (required):');
+            if (!reason) {
+                alert('Rejection reason is required');
+                return;
+            }
+            
+            const feedback = prompt('Optional feedback for agent:');
+            
+            try {
+                const response = await fetch(`${API_BASE}/approvals/${approvalId}/reject`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        reason: reason,
+                        feedback: feedback || null
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Content rejected');
+                    document.getElementById('approval-detail').classList.add('hidden');
+                    loadPendingApprovals();
+                } else {
+                    alert('Error rejecting content: ' + (data.error?.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error rejecting content:', error);
+                alert('Error rejecting content');
+            }
+        }
+        
+        // Load approvals on page load
+        loadPendingApprovals();
+        
+        // Refresh every 30 seconds
+        setInterval(loadPendingApprovals, 30000);
+    </script>
+</body>
+</html>

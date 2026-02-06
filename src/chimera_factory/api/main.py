@@ -8,10 +8,11 @@ import os
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from dotenv import load_dotenv
 
-from chimera_factory.api.routers import trends, content, engagement, agents, campaigns, openclaw
+from chimera_factory.api.routers import trends, content, engagement, agents, campaigns, openclaw, approvals
 from chimera_factory.api.models import APIResponse, ErrorResponse
 from chimera_factory.exceptions import ChimeraError
 from chimera_factory.utils.logging import setup_logger
@@ -55,6 +56,26 @@ app.include_router(engagement.router, prefix="/api/v1/engagement", tags=["engage
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(campaigns.router, prefix="/api/v1/campaigns", tags=["campaigns"])
 app.include_router(openclaw.router, prefix="/api/v1/openclaw", tags=["openclaw"])
+app.include_router(approvals.router, prefix="/api/v1/approvals", tags=["approvals"])
+
+# Mount static files for frontend interfaces
+# Reference: specs/frontend_requirements.md
+try:
+    import os
+    # Get project root (3 levels up from src/chimera_factory/api/main.py)
+    current_file = os.path.abspath(__file__)
+    api_dir = os.path.dirname(current_file)
+    chimera_dir = os.path.dirname(os.path.dirname(api_dir))
+    project_root = os.path.dirname(chimera_dir)
+    static_dir = os.path.join(project_root, "static")
+    
+    if os.path.exists(static_dir):
+        app.mount("/static", StaticFiles(directory=static_dir), name="static")
+        logger.info(f"Static files mounted from: {static_dir}")
+    else:
+        logger.warning(f"Static directory not found: {static_dir}")
+except Exception as e:
+    logger.warning(f"Could not mount static files: {e}")
 
 
 @app.exception_handler(ChimeraError)
@@ -122,5 +143,9 @@ async def root():
     return {
         "message": "Chimera Orchestrator API",
         "version": "0.1.0",
-        "docs": "/api/v1/docs"
+        "docs": "/api/v1/docs",
+        "frontend": {
+            "hitl_review": "/static/hitl-review.html",
+            "api_docs": "/api/v1/docs"
+        }
     }
