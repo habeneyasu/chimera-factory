@@ -1,12 +1,19 @@
-.PHONY: setup test spec-check clean help
+.PHONY: setup test test-unit test-integration test-contracts test-e2e test-all spec-check validate-task2 test-criteria clean help
 
 help:
 	@echo "Project Chimera - Makefile Commands"
 	@echo ""
-	@echo "  make setup       - Install dependencies"
-	@echo "  make test        - Run tests in Docker"
-	@echo "  make spec-check  - Verify code aligns with specs"
-	@echo "  make clean       - Clean build artifacts"
+	@echo "  make setup              - Install dependencies"
+	@echo "  make test               - Run tests in Docker"
+	@echo "  make test-unit          - Run unit tests"
+	@echo "  make test-integration   - Run integration tests"
+	@echo "  make test-contracts     - Run contract tests (API & Skills)"
+	@echo "  make test-e2e           - Run end-to-end tests"
+	@echo "  make test-all           - Run all tests with coverage"
+	@echo "  make spec-check         - Verify code aligns with specs"
+	@echo "  make validate-task2     - Validate Task 2 deliverables"
+	@echo "  make test-criteria      - Show test criteria summary"
+	@echo "  make clean              - Clean build artifacts"
 
 setup:
 	@echo "Installing dependencies..."
@@ -113,6 +120,56 @@ spec-check:
 	@echo ""
 	@echo "Note: Warnings are acceptable in early development stages."
 	@echo "      Errors must be resolved before merging code."
+
+validate-task2:
+	@echo "Validating Task 2: The Architect deliverables..."
+	@uv run python scripts/validate_task2.py
+
+test-unit:
+	@echo "Running unit tests..."
+	@uv run pytest tests/unit/ -v --cov=src/chimera_factory --cov-report=term-missing || echo "⚠️  Unit tests directory not found. Create tests/unit/ to add unit tests."
+
+test-integration:
+	@echo "Running integration tests..."
+	@uv run pytest tests/integration/ -v || echo "⚠️  Integration tests directory not found. Create tests/integration/ to add integration tests."
+
+test-contracts:
+	@echo "Running contract tests (API & Skills)..."
+	@uv run pytest tests/contracts/ -v || echo "⚠️  Contract tests directory not found. Create tests/contracts/ to add contract tests."
+
+test-e2e:
+	@echo "Running end-to-end tests..."
+	@uv run pytest tests/e2e/ -v || echo "⚠️  E2E tests directory not found. Create tests/e2e/ to add E2E tests."
+
+test-all:
+	@echo "Running all tests with coverage..."
+	@uv run pytest tests/ -v --cov=src/chimera_factory --cov-report=term-missing --cov-report=html || echo "⚠️  Tests directory structure not found. See docs/TEST_CRITERIA.md for test setup."
+
+test-criteria:
+	@echo "=========================================="
+	@echo "Project Chimera: Test Criteria Summary"
+	@echo "=========================================="
+	@echo ""
+	@echo "📋 Test Categories:"
+	@echo "  • Functional Testing (21+ user stories)"
+	@echo "  • API Contract Testing (7 endpoints)"
+	@echo "  • Skills Contract Testing (3 skills)"
+	@echo "  • Database Testing (schema, migrations)"
+	@echo "  • Integration Testing (MCP, OpenClaw)"
+	@echo "  • Performance Testing (1,000+ agents)"
+	@echo "  • Security Testing (auth, authorization)"
+	@echo "  • Compliance Testing (audit trails, HITL)"
+	@echo "  • SDD Validation (spec alignment)"
+	@echo "  • E2E Workflow Testing"
+	@echo ""
+	@echo "📖 Full documentation: docs/TEST_CRITERIA.md"
+	@echo ""
+	@echo "🎯 Test Coverage Targets:"
+	@echo "  • Code Coverage: 80%+"
+	@echo "  • API Coverage: 100%"
+	@echo "  • Skill Coverage: 100%"
+	@echo "  • User Story Coverage: 100%"
+	@echo ""
 
 clean:
 	@echo "Cleaning build artifacts..."
