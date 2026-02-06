@@ -1,5 +1,35 @@
 # Project Chimera: AI Co-Pilot Rules
 
+## Challenge Context & Submission Requirements
+
+**This repository is a submission for "Project Chimera: The Agentic Infrastructure Challenge".**
+
+### Challenge Objectives
+
+Project Chimera demonstrates:
+1. **Spec-Driven Development (SDD)**: Specifications in `specs/` are the source of truth
+2. **OpenClaw Integration**: Agent network participation with MCP protocol
+3. **Test-Driven Development (TDD)**: Failing tests define implementation requirements
+4. **IDE Agent Context**: AI co-pilot understands project structure and rules
+
+### Submission Deliverables
+
+This repository must demonstrate:
+- ✅ **Spec Structure**: Complete `specs/` directory with functional, technical, and integration specs
+- ✅ **OpenClaw Integration Plan**: Documented in `specs/openclaw_integration.md`
+- ✅ **Failing Tests**: Test suite that defines "empty slots" for implementation (TDD approach)
+- ✅ **IDE Agent Context**: This rules file enables AI to answer project questions using specs
+
+### How This Rules File Addresses the Challenge
+
+1. **Prime Directive**: Enforces checking `specs/` before code (SDD requirement)
+2. **Traceability**: Requires spec references in all code (demonstrates SDD)
+3. **OpenClaw Integration**: Explicit MCP usage rules (challenge requirement)
+4. **TDD Workflow**: Test-first development process (challenge requirement)
+5. **Project Understanding**: Comprehensive context for IDE agent demonstration
+
+---
+
 ## Project Context
 
 **This is Project Chimera, an autonomous influencer system.**
@@ -587,4 +617,70 @@ Statistics:
 
 ---
 
-**This rules file teaches the AI co-pilot how to behave when working on Project Chimera. Follow these rules to ensure code quality, spec alignment, and maintainability.**
+---
+
+## IDE Agent Context Demonstration
+
+### How to Demonstrate Agent Understanding
+
+When asked about the project, the AI co-pilot should:
+
+1. **Reference Specs First**: Always mention `specs/` directory and relevant spec files
+2. **Explain SDD Approach**: Describe how specs drive implementation
+3. **Mention OpenClaw**: Reference `specs/openclaw_integration.md` for network integration
+4. **Discuss TDD**: Explain how failing tests define implementation requirements
+5. **Show Architecture Understanding**: Reference FastRender Swarm, MCP, hybrid database
+
+### Example Responses That Demonstrate Context
+
+**Question**: "How do I implement a new skill?"
+
+**Good Response** (demonstrates context):
+```
+I need to check the specifications first (Prime Directive).
+
+Based on `.cursor/rules` and the project structure:
+
+1. **Check Specs**: Read `specs/functional.md` for user story requirements
+2. **Review Skill Contract**: Check `skills/skill_*/contract.json` for the contract format
+3. **Follow Pattern**: Look at existing skills in `src/chimera_factory/skills/`
+4. **Reference**: `specs/technical.md` for API contracts
+
+The skill should:
+- Follow the contract in `skills/skill_*/contract.json`
+- Use Pydantic models for input/output
+- Reference specs in docstrings
+- Include proper error handling
+
+This aligns with Spec-Driven Development (SDD) principles where specs are the source of truth.
+```
+
+**Question**: "What is the database architecture?"
+
+**Good Response** (demonstrates context):
+```
+According to `.cursor/rules` and ADR-001:
+
+**Hybrid Database Architecture**:
+- **PostgreSQL**: Transactional data (campaigns, approvals, audit logs)
+- **Weaviate**: Semantic memory for AI (vector database, RAG for long-term agent persona consistency)
+- **Redis**: Episodic cache & task queues
+- **On-Chain**: Financial ledger (Agentic Commerce)
+
+Reference: `.cursor/rules` Database Architecture section
+Reference: `docs/adr/ADR-001-hybrid-database-architecture.md`
+Reference: `specs/database/schema.sql` for schema details
+```
+
+### Key Indicators of Proper Context Understanding
+
+✅ Agent mentions "Prime Directive" or "check specs first"
+✅ Agent references specific spec files (`specs/functional.md`, `specs/technical.md`)
+✅ Agent shows understanding of SDD principles
+✅ Agent references OpenClaw integration (`specs/openclaw_integration.md`)
+✅ Agent mentions TDD approach and failing tests
+✅ Agent understands architecture patterns (FastRender Swarm, MCP, hybrid DB)
+
+---
+
+**This rules file teaches the AI co-pilot how to behave when working on Project Chimera. Follow these rules to ensure code quality, spec alignment, and maintainability. This file directly addresses the challenge requirement for IDE agent context demonstration.**
