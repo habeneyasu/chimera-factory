@@ -474,9 +474,9 @@ class Content(Base):
 
 ### When researching architecture:
 
-1. **`research/architecture_strategy.md`**: Architectural decisions
-2. **`research/submission_report_feb4.md`**: Research findings
-3. **`research/tooling_strategy.md`**: MCP vs Skills separation
+1. **`docs/adr/`**: Architecture Decision Records (ADR-001, ADR-002)
+2. **`specs/_meta.md`**: Master specification with architectural constraints
+3. **Note**: Research files are optional; findings are incorporated into specs and ADRs
 
 ---
 

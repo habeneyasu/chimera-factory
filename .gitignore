@@ -164,3 +164,9 @@ output/
 *.avi
 *.mov
 *.mkv
+
+# Large dependency lock files (if too large, consider excluding)
+# Note: uv.lock is required for explicit dependency locking
+# If submission size is an issue, consider using requirements.txt instead
+# uv.lock
+research/
