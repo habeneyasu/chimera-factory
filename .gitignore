@@ -170,3 +170,6 @@ output/
 # If submission size is an issue, consider using requirements.txt instead
 # uv.lock
 research/
+docs/REPOSITORY_SIZE_OPTIMIZATION.md
+scripts/create_submission_repo.sh
+scripts/optimize_repo_size.sh
